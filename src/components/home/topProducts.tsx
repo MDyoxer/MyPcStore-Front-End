@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, ImageOff, Check, Plus, Minus, SlidersHorizontal, Search, X } from "lucide-react"
+import { ShoppingCart, ImageOff, Check, Plus, Minus, SlidersHorizontal, Search, X, Heart } from "lucide-react"
 import { GetProducts, Products } from "@/src/actions/products/get-all-products"
 import { useState, useEffect, useCallback, useRef } from "react"
 import { formatMoney } from "@/src/utils/FormatMoney"
@@ -69,7 +69,7 @@ function ProductCard({
   inCart: boolean
 }) {
   const isActive = activeCart === product.id
-
+  const [liked, setLiked] = useState(false) 
   return (
     <article
       className="apex-card group relative flex flex-col bg-zinc-950 border border-zinc-800/60 overflow-hidden"
@@ -85,20 +85,20 @@ function ProductCard({
       {/* Neon corner accent */}
       <span
         aria-hidden
-        className="absolute top-0 right-0 w-[14px] h-[14px] bg-[#c8ff00] z-10"
+        className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#c8ff00] z-10"
         style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }}
       />
 
       {/* "En carrito" indicator */}
       {inCart && (
-        <span className="absolute top-3 left-3 z-20 flex items-center gap-1 bg-[#c8ff00] text-black px-2 py-0.5"
+        <span className="absolute top-3 left-3 z-20 flex items-center gap-1 bg-[#00ffff91] text-black px-2 py-0.5"
           style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase" }}>
           <Check className="w-2.5 h-2.5" /> En carrito
         </span>
       )}
 
       {/* Imagen */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-zinc-900">
+      <div className="relative aspect-4/3 overflow-hidden bg-zinc-900">
         {product.imagen ? (
           <Link href={`/products/${product.id}`}>
             <Image
@@ -133,7 +133,7 @@ function ProductCard({
         {/* Bottom neon line reveal */}
         <div
           aria-hidden
-          className="absolute bottom-0 left-0 h-[2px] bg-[#c8ff00] w-0 group-hover:w-full transition-all duration-500 ease-out"
+          className="absolute bottom-0 left-0 h-0.5 bg-[#c8ff00] w-0 group-hover:w-full transition-all duration-500 ease-out"
           style={{ boxShadow: "0 0 8px #c8ff00" }}
         />
       </div>
@@ -143,7 +143,7 @@ function ProductCard({
         {/* Categoría / Marca */}
         <div
           className="flex items-center gap-2 text-zinc-600"
-          style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase" }}
+          style={{ fontFamily: "'Space Mono', monospace", fontSize: "13px", letterSpacing: "0.2em", textTransform: "uppercase" }}
         >
           <span>{product.categoria}</span>
           <span className="text-[#c8ff00] opacity-60">✦</span>
@@ -151,32 +151,48 @@ function ProductCard({
         </div>
 
         {/* Nombre */}
-        <h3
-          className="text-white leading-tight line-clamp-2 group-hover:text-[#c8ff00] transition-colors duration-300"
-          style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.15rem", letterSpacing: "0.04em" }}
-        >
-          <Link href={`/products/${product.id}`}>
-            {product.nombre}
-          </Link>
-        </h3>
+       <div className="flex items-start justify-between gap-2">
+  <h3
+    className="text-white leading-tight line-clamp-2  transition-colors duration-300"
+    style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.15rem", letterSpacing: "0.04em" }}
+  >
+    <Link href={`/products/${product.id}`}>
+      {product.nombre}
+    </Link>
+  </h3>
+  <button
+    onClick={() => setLiked((v) => !v)}
+    aria-label={liked ? "Quitar de favoritos" : "Agregar a favoritos"}
+    className="shrink-0 mt-0.5 transition-transform duration-200 active:scale-90"
+  >
+    <Heart
+      className="w-4.5 h-4.5 transition-colors duration-200"
+      style={{
+        fill: liked ? "#a855f7" : "transparent",
+        stroke: liked ? "#a855f7" : "#52525b",
+        strokeWidth: 1.8,
+      }}
+    />
+  </button>
+</div>
 
         {/* Precio + Botón */}
         <div className="flex items-center justify-between mt-auto pt-2 border-t border-zinc-800/50">
           <span
-            className="text-[#c8ff00]"
+            className="text-[#9e00c6]"
             style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.5rem", letterSpacing: "0.02em" }}
           >
             {formatMoney(product.precio)}
           </span>
 
           {/* Cart toggle */}
-          <div className="relative h-9 w-[130px]">
+          <div className="relative h-9 w-32.5">
             {/* Botón agregar */}
             <button
               onClick={() => onOpenCart(product.id)}
               aria-label="Agregar al carrito"
               className={`absolute inset-0 flex items-center justify-center gap-1.5
-                          bg-[#c8ff00] text-black
+                          bg-[#c8ff00] text-black hover:bg-purple-700
                           transition-all duration-300 active:scale-95
                           ${isActive ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100"}`}
               style={{
@@ -250,7 +266,6 @@ export default function TopProducts() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [visibleCount, setVisibleCount] = useState(8)
   const searchRef = useRef<HTMLInputElement>(null)
-
   const cart = useProductCart()
 
   useEffect(() => {

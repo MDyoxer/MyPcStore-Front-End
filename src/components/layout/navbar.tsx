@@ -74,7 +74,7 @@ export default function Navbar() {
             <a
               key={link.label}
               href={link.href}
-              className="text-zinc-400 hover:text-white text-xs uppercase tracking-widest transition-all duration-200 hover:tracking-[0.2em] relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-purple-500 after:transition-all after:duration-300 hover:after:w-full"
+              className="text-zinc-400 hover:text-white text-xs uppercase tracking-widest transition-all duration-200 hover:tracking-[0.2em] relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-purple-500 after:transition-all after:duration-300 hover:after:w-full"
             >
               {link.label}
             </a>
