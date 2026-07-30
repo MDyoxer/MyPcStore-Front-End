@@ -459,7 +459,7 @@ export default function TopProducts() {
           {/* Contador de resultados */}
           <div
             className="text-zinc-600"
-            style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" }}
+            style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.15em", textTransform: "uppercase" }}
           >
             {filtered.length === 0
               ? "Sin resultados"

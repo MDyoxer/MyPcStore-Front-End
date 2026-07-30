@@ -19,13 +19,11 @@ export default function Navbar() {
 
   return (
     <nav className="bg-black border-b border-zinc-800">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        <a href="" className="flex items-center gap-2 shrink-0">
-          <Image src="/logo.svg" alt="MyPcStore" width={32} height={32} />
-          <span className="text-white font-bold text-lg tracking-tight">My PC Store</span>
+      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
+        <a href="/" className="flex shrink-0 items-center justify-start">
+          <Image src="/logo.png" alt="MyPcStore" width={302} height={102} className="object-contain" />
         </a>
-
-        <div className="hidden md:flex relative flex-1 max-w-md mx-6 group">
+        <div className="hidden md:flex relative flex-1 max-w-md mx-2 group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4 group-focus-within:text-purple-400 transition-colors duration-300" />
           <input
             type="text"
@@ -36,7 +34,7 @@ export default function Navbar() {
           />
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-4">
           {/* Theme */}
           <button className="hidden sm:flex p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all duration-200 active:scale-90">
             <Sun className="w-5 h-5" />
