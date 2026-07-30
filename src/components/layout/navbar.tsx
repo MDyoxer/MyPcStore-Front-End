@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import { Sun, Bell, ShoppingCart, Heart, Search, Menu, X, User } from "lucide-react";
+import { Sun, Bell, ShoppingCart, Heart, Search, Menu, X, User, Cpu } from "lucide-react";
 import Link from "next/link";
 const navLinks = [
   { label: "Productos", href: "/" },
@@ -19,10 +19,22 @@ export default function Navbar() {
 
   return (
     <nav className="bg-black border-b border-zinc-800">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
-        <a href="/" className="flex shrink-0 items-center justify-start">
-          <Image src="/logo.png" alt="MyPcStore" width={302} height={102} className="object-contain" />
-        </a>
+      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4 justify-between relative">
+        <Link href="/" className="flex items-center gap-2 group">
+          <div
+            className="flex items-center justify-center w-9 h-9 bg-[#c8ff00]"
+            style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}
+          >
+            <Cpu className="w-5 h-5 text-black" />
+          </div>
+          <span
+            className="text-white group-hover:text-[#c8ff00] transition-colors duration-200"
+            style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.8rem", letterSpacing: "0.1em" }}
+          >
+            MyPC<span className="text-[#c8ff00]">Store</span>
+          </span>
+        </Link>
+
         <div className="hidden md:flex relative flex-1 max-w-md mx-2 group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4 group-focus-within:text-purple-400 transition-colors duration-300" />
           <input

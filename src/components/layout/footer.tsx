@@ -5,23 +5,22 @@ import {  Mail, MapPin, Phone, ArrowUpRight, Cpu } from "lucide-react";
 
 const LINKS = {
   tienda: [
-    { label: "Catálogo", href: "/productos" },
-    { label: "Procesadores", href: "/productos?cat=procesadores" },
-    { label: "Tarjetas de video", href: "/productos?cat=gpu" },
-    { label: "Memorias RAM", href: "/productos?cat=ram" },
-    { label: "Almacenamiento", href: "/productos?cat=storage" },
+    { label: "Catálogo", href: "/" },
+    { label: "Procesadores", href: "/" },
+    { label: "Tarjetas de video", href: "/" },
+    { label: "Memorias RAM", href: "/" },
+    { label: "Almacenamiento", href: "/" },
   ],
   empresa: [
-    { label: "Acerca de nosotros", href: "/about" },
-    { label: "Testimonios", href: "/reviews" },
-    { label: "Blog técnico", href: "/blog" },
-    { label: "Trabaja con nosotros", href: "/careers" },
+    { label: "Acerca de nosotros", href: "/" },
+    { label: "Blog técnico", href: "/" },
+    { label: "Trabaja con nosotros", href: "/" },
   ],
   soporte: [
-    { label: "Centro de ayuda", href: "/help" },
-    { label: "Política de envíos", href: "/shipping" },
-    { label: "Garantías", href: "/warranty" },
-    { label: "Devoluciones", href: "/returns" },
+    { label: "Centro de ayuda", href: "/" },
+    { label: "Política de envíos", href: "/" },
+    { label: "Garantías", href: "/" },
+    { label: "Devoluciones", href: "/" },
   ],
 };
 
@@ -72,7 +71,7 @@ export default function Footer() {
           {/* Tagline */}
           <p
             className="text-zinc-600 max-w-xs"
-            style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.12em", lineHeight: "1.7" }}
+            style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.12em", lineHeight: "1.7" }}
           >
             Hardware de alto rendimiento para gamers, creadores y profesionales.
           </p>
@@ -87,7 +86,7 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1 flex flex-col gap-5">
             <span
               className="text-[#c8ff00] flex items-center gap-2"
-              style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase" }}
+              style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.3em", textTransform: "uppercase" }}
             >
               <span className="w-4 h-px bg-[#c8ff00]" />
               Contacto
@@ -98,7 +97,7 @@ export default function Footer() {
                   <Icon className="w-3.5 h-3.5 text-[#c8ff00] flex-shrink-0" />
                   <span
                     className="text-zinc-500"
-                    style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.05em" }}
+                    style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.05em" }}
                   >
                     {text}
                   </span>
@@ -111,7 +110,7 @@ export default function Footer() {
           <div className="flex flex-col gap-5">
             <span
               className="text-[#c8ff00] flex items-center gap-2"
-              style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase" }}
+              style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.3em", textTransform: "uppercase" }}
             >
               <span className="w-4 h-px bg-[#c8ff00]" />
               Tienda
@@ -122,7 +121,7 @@ export default function Footer() {
                   <Link
                     href={l.href}
                     className="group flex items-center gap-1 text-zinc-600 hover:text-white transition-colors duration-200"
-                    style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.08em" }}
+                    style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.08em" }}
                   >
                     <span className="w-0 group-hover:w-3 h-px bg-[#c8ff00] transition-all duration-200 flex-shrink-0" />
                     {l.label}
@@ -136,7 +135,7 @@ export default function Footer() {
           <div className="flex flex-col gap-5">
             <span
               className="text-[#c8ff00] flex items-center gap-2"
-              style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase" }}
+              style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.3em", textTransform: "uppercase" }}
             >
               <span className="w-4 h-px bg-[#c8ff00]" />
               Empresa
@@ -147,7 +146,7 @@ export default function Footer() {
                   <Link
                     href={l.href}
                     className="group flex items-center gap-1 text-zinc-600 hover:text-white transition-colors duration-200"
-                    style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.08em" }}
+                    style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.08em" }}
                   >
                     <span className="w-0 group-hover:w-3 h-px bg-[#c8ff00] transition-all duration-200 flex-shrink-0" />
                     {l.label}
@@ -161,7 +160,7 @@ export default function Footer() {
           <div className="flex flex-col gap-5">
             <span
               className="text-[#c8ff00] flex items-center gap-2"
-              style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase" }}
+              style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.3em", textTransform: "uppercase" }}
             >
               <span className="w-4 h-px bg-[#c8ff00]" />
               Soporte
@@ -172,7 +171,7 @@ export default function Footer() {
                   <Link
                     href={l.href}
                     className="group flex items-center gap-1 text-zinc-600 hover:text-white transition-colors duration-200"
-                    style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.08em" }}
+                    style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.08em" }}
                   >
                     <span className="w-0 group-hover:w-3 h-px bg-[#c8ff00] transition-all duration-200 flex-shrink-0" />
                     {l.label}
@@ -187,7 +186,7 @@ export default function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-6">
           <p
             className="text-zinc-700"
-            style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase" }}
+            style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.15em", textTransform: "uppercase" }}
           >
             © {new Date().getFullYear()} MyPcStore — Todos los derechos reservados.
           </p>
@@ -198,7 +197,7 @@ export default function Footer() {
                 key={t}
                 href="#"
                 className="text-zinc-700 hover:text-zinc-400 transition-colors duration-200"
-                style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase" }}
+                style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.15em", textTransform: "uppercase" }}
               >
                 {t}
               </Link>
@@ -209,7 +208,7 @@ export default function Footer() {
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="flex items-center gap-1.5 text-zinc-700 hover:text-[#c8ff00] transition-colors duration-200 group"
-            style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase" }}
+            style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.15em", textTransform: "uppercase" }}
           >
             Volver arriba
             <ArrowUpRight className="w-3 h-3 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
