@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Sun, Bell, ShoppingCart, Heart, Search, Menu, X, User, Cpu, DoorOpen, Package  } from "lucide-react";
 import Link from "next/link";
 const navLinks = [
-  { label: "Productos", href: "/" },
+  { label: "Productos", href: "/allProducts" },
   { label: "Equipos", href: "/" },
   { label: "Hardware", href: "/" },
   { label: "Mis compras", href: "/" },

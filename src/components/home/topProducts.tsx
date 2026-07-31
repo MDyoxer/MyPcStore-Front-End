@@ -6,7 +6,6 @@ import { ShoppingCart, ImageOff, Check, Plus, Minus, SlidersHorizontal, Search, 
 import { GetProducts, Products } from "@/src/actions/products/get-all-products"
 import { useState, useEffect, useCallback, useRef } from "react"
 import { formatMoney } from "@/src/utils/formatMoney"
-
 // ─── TIPOS ───────────────────────────────────────────────────────────────────
 type SortKey = "default" | "price-asc" | "price-desc" | "name"
 
@@ -15,7 +14,6 @@ function useProductCart() {
   const [activeCart, setActiveCart] = useState<number | null>(null)
   const [quantities, setQuantities] = useState<Record<number, number>>({})
   const [cartItems, setCartItems] = useState<Record<number, boolean>>({})
-
   const getQty = useCallback((id: number) => quantities[id] ?? 1, [quantities])
 
   const increase = (id: number) =>
@@ -80,7 +78,7 @@ function ProductCard({
         transitionDelay: `${index * 55}ms`,
         clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
       }}
-    >
+    > 
       {/* TODO: FUTURISTIC LOADING ANIMATION */}
       {/* Neon corner accent */}
       <span
@@ -106,7 +104,7 @@ function ProductCard({
               alt={product.nombre}
               width={400}
               height={300}
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              className="w-full h-full object-contain transition-transform duration-700 ease-out group-hover:scale-105"
             />
           </Link>
         ) : (
@@ -257,9 +255,9 @@ function ProductCard({
 }
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
-export default function TopProducts() {
+export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
   const [products, setProducts] = useState<Products[]>([])
-  const [loaded, setLoaded] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState<SortKey>("default")
   const [showFilters, setShowFilters] = useState(false)
@@ -270,12 +268,16 @@ export default function TopProducts() {
 
   useEffect(() => {
     const load = async () => {
-      const data = await GetProducts()
+      const [data] = await Promise.all([
+        GetProducts(),
+        new Promise((resolve) => setTimeout(resolve, 600)),
+      ])
       setProducts(data)
-      setTimeout(() => setLoaded(true), 80)
+      setLoading(false)
+      onLoaded?.()
     }
     load()
-  }, [])
+  }, [onLoaded])
 
   // Categorías únicas
   const categories = ["all", ...Array.from(new Set(products.map((p) => p.categoria).filter(Boolean)))]
@@ -302,11 +304,11 @@ export default function TopProducts() {
   const visible = filtered.slice(0, visibleCount)
   const hasMore = visibleCount < filtered.length
   const totalInCart = Object.values(cart.cartItems).filter(Boolean).length
-
   return (
     <section className="w-full bg-black py-16 relative overflow-hidden">
 
       {/* Fondo de grid sutil */}
+      
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
@@ -461,14 +463,14 @@ export default function TopProducts() {
             className="text-zinc-600"
             style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.15em", textTransform: "uppercase" }}
           >
-            {filtered.length === 0
+            {!loading && filtered.length === 0
               ? "Sin resultados"
               : `Mostrando ${Math.min(visibleCount, filtered.length)} de ${filtered.length} productos`}
           </div>
         </div>
 
         {/* ── GRID DE PRODUCTOS ── */}
-        {filtered.length === 0 ? (
+        {!loading && filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4 border border-zinc-800/50">
             <span
               style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "4rem", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.2)" }}
@@ -497,7 +499,7 @@ export default function TopProducts() {
                 key={product.id}
                 product={product}
                 index={i}
-                loaded={loaded}
+                loaded={!loading}
                 activeCart={cart.activeCart}
                 onOpenCart={cart.openCart}
                 onConfirm={cart.confirm}

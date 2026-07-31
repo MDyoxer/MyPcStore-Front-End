@@ -40,7 +40,7 @@ function EmptyCart() {
                 No tienes productos en tu carrito.
             </p>
             <Link
-                href="/productos"
+                href="/allProducts"
                 className="inline-flex items-center gap-2 bg-[#c8ff00] text-black px-6 py-3 hover:bg-yellow-300 active:scale-95 transition-all duration-200"
                 style={{
                     fontFamily: "'Space Mono', monospace",
@@ -218,7 +218,7 @@ export default function Cart() {
 
                 {/* ── BREADCRUMB ── */}
                 <Link
-                    href="/productos"
+                    href="/allProducts"
                     className="inline-flex items-center gap-2 text-zinc-400 hover:text-[#c8ff00] transition-colors duration-200 group mb-10"
                     style={{ fontFamily: "'Space Mono', monospace", fontSize: "13px", letterSpacing: "0.2em", textTransform: "uppercase" }}
                 >

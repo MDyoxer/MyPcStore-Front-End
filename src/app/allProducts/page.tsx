@@ -1,9 +1,9 @@
 import Allproducts from "@/src/components/products/allproducts";
-//TODO: Dashboard reservado para admin
-export default function DashboardPage() {
+
+export default function AllProductsPage() {
     return (
         <div>
-            <h1>ADMIN aqui</h1>
+            <Allproducts />
         </div>
     )
 }

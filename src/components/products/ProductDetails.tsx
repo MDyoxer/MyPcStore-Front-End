@@ -226,7 +226,7 @@ export default function ProductDetails({ id }: { id: number }) {
                   alt={product.nombre}
                   width={400}
                   height={400}
-                  className="w-full h-full object-cover aspect-square transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="w-full h-full object-contain aspect-square transition-transform duration-700 ease-out group-hover:scale-105"
                   priority
                 />
                 {/* Overlay scanline */}
