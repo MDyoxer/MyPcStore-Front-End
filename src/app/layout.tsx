@@ -1,7 +1,7 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
 import Navbar from "../components/layout/navbar";
 import { Bebas_Neue } from "next/font/google";
+import { AuthProvider } from "../context/AuthContext";
 const bebasNeue = Bebas_Neue({
   variable: "--font-bebas-neue",
   subsets: ["latin"],
@@ -16,8 +16,10 @@ export default function RootLayout({
   return (
     <html className={bebasNeue.variable}>
       <body className="font-sans">
-        <Navbar />
-        {children}
+        <AuthProvider>
+          <Navbar />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )

@@ -91,13 +91,14 @@ export default function About() {
 
           {/* Imagen */}
           <div
-            className="relative bg-zinc-950 overflow-hidden group min-h-[340px]"
+            className="relative bg-zinc-950 overflow-hidden group min-h-85"
             style={{ clipPath: "polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%)" }}
           >
             <Image
               src="/ryzen9800.png"
               alt="AMD Ryzen 9 9950X"
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />
             {/* Overlay morado profundo */}
@@ -128,7 +129,7 @@ export default function About() {
             {/* Línea neon bottom */}
             <div
               aria-hidden
-              className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full bg-[#c8ff00] transition-all duration-700"
+              className="absolute bottom-0 left-0 h-0.5 w-0 group-hover:w-full bg-[#c8ff00] transition-all duration-700"
               style={{ boxShadow: "0 0 8px #c8ff00" }}
             />
           </div>
@@ -244,13 +245,14 @@ export default function About() {
 
           {/* Imagen */}
           <div
-            className="relative bg-zinc-950 overflow-hidden group min-h-[340px] order-1 lg:order-2"
+            className="relative bg-zinc-950 overflow-hidden group min-h-85 order-1 lg:order-2"
             style={{ clipPath: "polygon(16px 0, 100% 0, 100% 100%, 0 100%, 0 16px)" }}
           >
             <Image
               src="/I9.png"
               alt="Intel Core i9-14900K"
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />
             {/* Overlay azul/morado profundo */}
@@ -281,7 +283,7 @@ export default function About() {
             {/* Línea neon bottom morado */}
             <div
               aria-hidden
-              className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full bg-purple-500 transition-all duration-700"
+              className="absolute bottom-0 left-0 h-0.5 w-0 group-hover:w-full bg-purple-500 transition-all duration-700"
               style={{ boxShadow: "0 0 8px #a855f7" }}
             />
           </div>
@@ -322,7 +324,7 @@ export default function About() {
                 {/* Línea neon inferior */}
                 <div
                   aria-hidden
-                  className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500"
+                  className="absolute bottom-0 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-500"
                   style={{ background: i % 2 === 0 ? "#c8ff00" : "#a855f7", boxShadow: `0 0 8px ${i % 2 === 0 ? "#c8ff00" : "#a855f7"}` }}
                 />
                 <span className="text-3xl">{v.icon}</span>

@@ -5,7 +5,7 @@ import Link from "next/link"
 import { ShoppingCart, ImageOff, Check, Plus, Minus, SlidersHorizontal, Search, X, Heart } from "lucide-react"
 import { GetProducts, Products } from "@/src/actions/products/get-all-products"
 import { useState, useEffect, useCallback, useRef } from "react"
-import { formatMoney } from "@/src/utils/FormatMoney"
+import { formatMoney } from "@/src/utils/formatMoney"
 
 // ─── TIPOS ───────────────────────────────────────────────────────────────────
 type SortKey = "default" | "price-asc" | "price-desc" | "name"

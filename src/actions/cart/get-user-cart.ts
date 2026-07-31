@@ -1,4 +1,4 @@
-import { buildApiUrl } from "@/src/utils/BaseApiUrl";
+import { buildApiUrl } from "@/src/utils/baseApiUrl";
 export type cartItems={
     id:number,
     cantidad:number,

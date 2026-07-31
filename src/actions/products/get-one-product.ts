@@ -1,6 +1,6 @@
 //Get information about one product from the api and return it as a Product object used on ProductDetails.tsx
 "use client"
-import { buildApiUrl } from "@/src/utils/BaseApiUrl"
+import { buildApiUrl } from "@/src/utils/baseApiUrl"
 export type Product = {
     id: number,
     categoria: string,

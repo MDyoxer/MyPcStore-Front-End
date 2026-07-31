@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { GetOneProduct, Product } from "@/src/actions/products/get-one-product";
 import { useState, useEffect } from "react";
-import { formatMoney } from "@/src/utils/FormatMoney";
+import { formatMoney } from "@/src/utils/formatMoney";
 
 // ─── BADGE DE STOCK ──────────────────────────────────────────────────────────
 function StockBadge({ stock }: { stock: number }) {
@@ -197,7 +197,7 @@ export default function ProductDetails({ id }: { id: number }) {
       {/* ── BREADCRUMB ── */}
       <div className="max-w-7xl mx-auto px-4 pt-10 pb-0">
         <Link
-          href="/productos"
+          href="/"
           className="inline-flex items-center gap-2 text-zinc-400 hover:text-[#c8ff00] transition-colors duration-200 group"
           style={{ fontFamily: "'Space Mono', monospace", fontSize: "13fpx", letterSpacing: "0.2em", textTransform: "uppercase" }}
         >

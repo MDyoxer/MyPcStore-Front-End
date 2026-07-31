@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Cpu, User } from "lucide-react";
 import { handleGoogleSignIn } from "@/src/utils/googleAuth";
+import { useRouter } from "next/navigation";
+import { handleSignUp } from "@/src/utils/emailAuth";
+import GoogleLinkPrompt from "./GoogleLinkPrompt";
+import type { AuthCredential } from "firebase/auth";
 export default function SignIn() {
     const [showPass, setShowPass] = useState(false);
     const [email, setEmail] = useState("");
@@ -11,25 +15,49 @@ export default function SignIn() {
     const [password, setPassword] = useState("");
     const [password2, setPassword2] = useState("");
     const [loading, setLoading] = useState(false);
-
+    const router = useRouter();
+    const [error, setError] = useState<string | null>(null);
+    const [linkPrompt, setLinkPrompt] = useState<{ email: string; credential: AuthCredential } | null>(null);
 
     const handleSubmitByEmail = async (e: React.FormEvent) => {
-
-        if (password.trim() === "" || password2.trim() === "") {
-            alert("La contraseña no puede estar vacía");
-            return;
-        }
-
-        if (password !== password2) {
-            alert("Las contraseñas no coinciden");
-            return;
-        }
         e.preventDefault();
+        if (password.trim() === "" || password2.trim() === "") {
+            setError("La contraseña no puede estar vacía");
+            return;
+        }
+        if (password !== password2) {
+            setError("Las contraseñas no coinciden");
+            return;
+        }
         setLoading(true);
-        // lógica de auth aquí
-        setTimeout(() => setLoading(false), 1500);
+        setError(null);
+        const result = await handleSignUp(email, password, nombre);
+        setLoading(false);
+        if (result.error) {
+            setError(result.error);
+            return;
+        }
+        router.push("/");
     };
-    
+
+    const handleGoogleClick = async () => {
+        setError(null);
+        const result = await handleGoogleSignIn();
+        if (result.error) {
+            if (result.error.code === "account-exists-with-different-credential") {
+                if (result.error.email && result.error.credential) {
+                    setLinkPrompt({ email: result.error.email, credential: result.error.credential });
+                } else {
+                    setError("Este correo ya está registrado con contraseña. Inicia sesión con tu correo y contraseña.");
+                }
+            } else {
+                setError("No se pudo iniciar sesión con Google. Intenta de nuevo.");
+            }
+            return;
+        }
+        router.push("/");
+    };
+
     return (
         <div className="min-h-screen w-full bg-black flex items-center justify-center relative overflow-hidden px-4">
 
@@ -297,7 +325,11 @@ export default function SignIn() {
                         )}
                     </button>
                 </form>
-
+                {error && (
+                    <p className="text-center text-red-400 text-xs" style={{ fontFamily: "'Space Mono', monospace", letterSpacing: "0.1em" }}>
+                        {error}
+                    </p>
+                )}
                 {/* ── DIVIDER ── */}
                 <div className="flex items-center gap-3">
                     <span className="flex-1 h-px bg-zinc-800" />
@@ -313,10 +345,12 @@ export default function SignIn() {
                 {/* ── GOOGLE ── */}
                 <button
                     type="button"
-                    onClick={handleGoogleSignIn}
+                    onClick={handleGoogleClick}
+                    disabled={!!linkPrompt}
                     className="w-full flex items-center justify-center gap-3 border border-zinc-700/80
                      bg-zinc-900/50 text-zinc-300 py-3
                      hover:border-purple-500/50 hover:text-white hover:bg-zinc-900
+                     disabled:opacity-50 disabled:cursor-not-allowed
                      active:scale-[0.98] transition-all duration-200"
                     style={{
                         fontFamily: "'Space Mono', monospace",
@@ -336,6 +370,15 @@ export default function SignIn() {
                     </svg>
                     Google
                 </button>
+
+                {/* ── VINCULACIÓN GOOGLE ── */}
+                {linkPrompt && (
+                    <GoogleLinkPrompt
+                        email={linkPrompt.email}
+                        credential={linkPrompt.credential}
+                        onCancel={() => setLinkPrompt(null)}
+                    />
+                )}
 
                 {/* ── REGISTRO ── */}
                 <p

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Plus, Minus, Trash2, ShoppingCart, ImageOff, ArrowLeft, Tag } from "lucide-react";
 import { GetUserCart, cartItems } from "@/src/actions/cart/get-user-cart";
-import { formatMoney } from "@/src/utils/FormatMoney";
+import { formatMoney } from "@/src/utils/formatMoney";
 
 // ─── SKELETON ────────────────────────────────────────────────────────────────
 function CartSkeleton() {
