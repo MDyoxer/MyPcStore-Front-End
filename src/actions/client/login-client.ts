@@ -1,6 +1,6 @@
 import { buildApiUrl } from "@/src/utils/baseApiUrl";
 import { Client } from "./register-client";
-
+//TODO: no mandar idtoken como parametro same in registerClient
 export async function LoginClient(idToken:string):Promise<Client>{
         const response = await fetch(buildApiUrl("/auth/login"), {
         method: "POST",

@@ -1,8 +1,9 @@
 "use client";
 import { useAuth } from "@/src/context/AuthContext";
 import { useState } from "react";
-import { Sun, Bell, ShoppingCart, Heart, Search, Menu, X, User, Cpu, DoorOpen, Package  } from "lucide-react";
+import { Sun, Bell, ShoppingCart, Heart, Search, Menu, X, User, Cpu, DoorOpen, Package } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 const navLinks = [
   { label: "Productos", href: "/allProducts" },
   { label: "Equipos", href: "/" },
@@ -18,6 +19,16 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, loading, signOutUser } = useAuth();
+  const router = useRouter();
+  const handleSignOut = async () => {
+    try {
+      setIsUserMenuOpen(false);
+      await signOutUser();
+      router.push("/");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
   return (
     <nav className="bg-black border-b border-zinc-800 sticky top-0 shadow-md z-50">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4 justify-between relative">
@@ -62,9 +73,9 @@ export default function Navbar() {
             <ShoppingCart className="w-5 h-5" />
           </Link>
           {/* Favorite products */}
-          <button className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all duration-200 active:scale-90">
+          <Link href="/favorites" className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all duration-200 active:scale-90">
             <Heart className="w-5 h-5" />
-          </button>
+          </Link>
           {/* User profile */}
           <div className="relative">
             <button
@@ -79,48 +90,49 @@ export default function Navbar() {
             {isUserMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-zinc-900/70 backdrop-blur border border-zinc-800 rounded-xl py-1.5 shadow-lg shadow-black/50 z-50">
                 <ul className="space-y-0.5">
-                  <li className="px-3 flex items-center  py-2 text-sm text-white border-b-2"  style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}>
+                  <li className="px-3 flex items-center  py-2 text-sm text-white border-b-2" style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}>
                     {loading ? "..." : user ? `Hola ${user.displayName ?? "Cliente"}` : "Hola, Invitado"}
                   </li>
-                 {user ? (
-                  <>
-                  <li className="border border-transparent rounded-lg mt-2 transition-all p-2
+                  {user ? (
+                    <>
+                      <li className="border border-transparent rounded-lg mt-2 transition-all p-2
                    duration-200 hover:border-[#c8ff00] ">
-                    <Link
-                      href="/"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center  px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 hover:rounded-sm transition-all duration-200"
-                      style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}
-                    >
-                      Mis compras <Package className="w-4 h-4 ml-auto" />
-                    </Link>
-                  </li>
-                  <li className="border border-transparent rounded-lg p-2 transition-all duration-200 hover:border-[#c8ff00]">
-                    <button
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        signOutUser();
-                      }}
-                      className="w-full flex items-center justify-between px-3 py-2 hover:rounded-sm text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all duration-200"
-                      style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}
-                    >
-                      Cerrar Sesión
-                      <DoorOpen className="w-4 h-4" />
-                    </button>
-                  </li>
-                  </>
-                  ):(
-                     <li className="border border-transparent rounded-lg mt-2 transition-all p-2
+                        <Link
+                          href="/"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center  px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 hover:rounded-sm transition-all duration-200"
+                          style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}
+                        >
+                          Mis compras <Package className="w-4 h-4 ml-auto" />
+                        </Link>
+                      </li>
+                      <li className="border border-transparent rounded-lg p-2 transition-all duration-200 hover:border-[#c8ff00]">
+                        <button
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            signOutUser();
+                            handleSignOut();
+                          }}
+                          className="w-full flex items-center justify-between px-3 py-2 hover:rounded-sm text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all duration-200"
+                          style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}
+                        >
+                          Cerrar Sesión
+                          <DoorOpen className="w-4 h-4" />
+                        </button>
+                      </li>
+                    </>
+                  ) : (
+                    <li className="border border-transparent rounded-lg mt-2 transition-all p-2
                    duration-200 hover:border-[#c8ff00] ">
-                    <Link
-                      href="/login"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center  px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 hover:rounded-sm transition-all duration-200"
-                      style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}
-                    >
-                     Inicia sesión <DoorOpen className="w-4 h-4 ml-auto" />
-                    </Link>
-                  </li>
+                      <Link
+                        href="/login"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center  px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 hover:rounded-sm transition-all duration-200"
+                        style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}
+                      >
+                        Inicia sesión <DoorOpen className="w-4 h-4 ml-auto" />
+                      </Link>
+                    </li>
                   )}
                 </ul>
               </div>

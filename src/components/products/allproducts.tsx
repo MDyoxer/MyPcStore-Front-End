@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+//import { AddToCart } from "@/src/actions/cart/add-to-cart";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   ShoppingCart, ImageOff, Check, Plus, Minus, Heart,
@@ -61,7 +62,7 @@ function ProductCard({
         clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
       }}
     >
-      <span aria-hidden className="absolute top-0 right-0 w-[14px] h-[14px] bg-[#c8ff00] z-10"
+      <span aria-hidden className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#c8ff00] z-10"
         style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }} />
 
       {inCart && (
@@ -72,7 +73,7 @@ function ProductCard({
       )}
 
       {/* Imagen */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-zinc-900">
+      <div className="relative aspect-4/3 overflow-hidden bg-zinc-900">
 
         {product.imagen ? (
          <Link href={`/products/${product.id}`}>
@@ -90,7 +91,7 @@ function ProductCard({
         )}
         <div aria-hidden className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
           style={{ background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,255,0,0.02) 2px, rgba(200,255,0,0.02) 4px)" }} />
-        <div aria-hidden className="absolute bottom-0 left-0 h-[2px] bg-[#c8ff00] w-0 group-hover:w-full transition-all duration-500 ease-out"
+        <div aria-hidden className="absolute bottom-0 left-0 h-0.5 bg-[#c8ff00] w-0 group-hover:w-full transition-all duration-500 ease-out"
           style={{ boxShadow: "0 0 8px #c8ff00" }} />
       </div>
 
@@ -110,8 +111,8 @@ function ProductCard({
             <Link href={`/products/${product.id}`}>{product.nombre}</Link>
           </h3>
           <button onClick={() => setLiked((v) => !v)} aria-label="Favorito"
-            className="flex-shrink-0 mt-0.5 active:scale-90 transition-transform duration-200">
-            <Heart className="w-[18px] h-[18px] transition-colors duration-200"
+            className="shrink-0 mt-0.5 active:scale-90 transition-transform duration-200">
+            <Heart className="w-4.5 h-4.5 transition-colors duration-200"
               style={{ fill: liked ? "#a855f7" : "transparent", stroke: liked ? "#a855f7" : "#52525b", strokeWidth: 1.8 }} />
           </button>
         </div>
@@ -123,7 +124,7 @@ function ProductCard({
             {formatMoney(product.precio)}
           </span>
 
-          <div className="relative h-9 w-[130px]">
+          <div className="relative h-9 w-32.5">
             <button onClick={() => onOpenCart(product.id)}
               className={`absolute inset-0 flex items-center justify-center gap-1.5 bg-[#c8ff00] text-black
                           transition-all duration-300 active:scale-95
@@ -199,7 +200,7 @@ function FilterCheckbox({ label, checked, onChange, count, accent = "#c8ff00" }:
     <label className="flex items-center gap-2.5 cursor-pointer group">
       <span
         onClick={onChange}
-        className="flex-shrink-0 w-4 h-4 border transition-all duration-200 flex items-center justify-center"
+        className="shrink-0 w-4 h-4 border transition-all duration-200 flex items-center justify-center"
         style={{
           borderColor: checked ? accent : "#3f3f46",
           background: checked ? accent : "transparent",
@@ -406,8 +407,8 @@ export default function AllProducts() {
 
           {/* ── SIDEBAR FILTROS ── */}
           <aside className={`
-            flex-shrink-0 w-64 bg-zinc-950 border border-zinc-800/60 flex flex-col
-            lg:sticky lg:top-6
+           shrink-0 w-64 bg-zinc-950 border border-zinc-800/60 flex flex-col
+             lg:top-6
             fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
             transition-transform duration-300 ease-out overflow-y-auto
             lg:translate-x-0 lg:max-h-[calc(100vh-3rem)]
@@ -416,7 +417,7 @@ export default function AllProducts() {
             style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
 
             {/* Acento */}
-            <span aria-hidden className="absolute top-0 right-0 w-[12px] h-[12px] bg-purple-500"
+            <span aria-hidden className="absolute top-0 right-0 w-3 h-3 bg-purple-500"
               style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }} />
 
             {/* Header sidebar */}

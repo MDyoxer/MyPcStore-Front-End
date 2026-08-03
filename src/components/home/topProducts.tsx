@@ -2,9 +2,12 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { AddFavoriteItem } from "@/src/actions/favorites/add-favorite"
+import { AddToCart } from "@/src/actions/cart/add-to-cart"
 import { ShoppingCart, ImageOff, Check, Plus, Minus, SlidersHorizontal, Search, X, Heart } from "lucide-react"
 import { GetProducts, Products } from "@/src/actions/products/get-all-products"
 import { useState, useEffect, useCallback, useRef } from "react"
+import { useAuth } from "@/src/context/AuthContext"
 import { formatMoney } from "@/src/utils/formatMoney"
 // ─── TIPOS ───────────────────────────────────────────────────────────────────
 type SortKey = "default" | "price-asc" | "price-desc" | "name"
@@ -52,6 +55,7 @@ function ProductCard({
   onConfirm,
   onIncrease,
   onDecrease,
+  onFavorite,
   qty,
   inCart,
 }: {
@@ -63,11 +67,12 @@ function ProductCard({
   onConfirm: (id: number) => void
   onIncrease: (id: number) => void
   onDecrease: (id: number) => void
+  onFavorite: (id: number) => void
   qty: number
   inCart: boolean
 }) {
   const isActive = activeCart === product.id
-  const [liked, setLiked] = useState(false) 
+  const [liked, setLiked] = useState(false)
   return (
     <article
       className="apex-card group relative flex flex-col bg-zinc-950 border border-zinc-800/60 overflow-hidden"
@@ -78,8 +83,7 @@ function ProductCard({
         transitionDelay: `${index * 55}ms`,
         clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
       }}
-    > 
-      {/* TODO: FUTURISTIC LOADING ANIMATION */}
+    >
       {/* Neon corner accent */}
       <span
         aria-hidden
@@ -149,30 +153,33 @@ function ProductCard({
         </div>
 
         {/* Nombre */}
-       <div className="flex items-start justify-between gap-2">
-  <h3
-    className="text-white leading-tight line-clamp-2  transition-colors duration-300"
-    style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.15rem", letterSpacing: "0.04em" }}
-  >
-    <Link href={`/products/${product.id}`}>
-      {product.nombre}
-    </Link>
-  </h3>
-  <button
-    onClick={() => setLiked((v) => !v)}
-    aria-label={liked ? "Quitar de favoritos" : "Agregar a favoritos"}
-    className="shrink-0 mt-0.5 transition-transform duration-200 active:scale-90"
-  >
-    <Heart
-      className="w-4.5 h-4.5 transition-colors duration-200"
-      style={{
-        fill: liked ? "#a855f7" : "transparent",
-        stroke: liked ? "#a855f7" : "#52525b",
-        strokeWidth: 1.8,
-      }}
-    />
-  </button>
-</div>
+        <div className="flex items-start justify-between gap-2">
+          <h3
+            className="text-white leading-tight line-clamp-2  transition-colors duration-300"
+            style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.15rem", letterSpacing: "0.04em" }}
+          >
+            <Link href={`/products/${product.id}`}>
+              {product.nombre}
+            </Link>
+          </h3>
+          <button
+            onClick={() => {
+              setLiked((v) => !v);
+              onFavorite(product.id);
+            }}
+            aria-label={liked ? "Quitar de favoritos" : "Agregar a favoritos"}
+            className="shrink-0 mt-0.5 transition-transform duration-200 active:scale-90"
+          >
+            <Heart
+              className="w-4.5 h-4.5 transition-colors duration-200"
+              style={{
+                fill: liked ? "#a855f7" : "transparent",
+                stroke: liked ? "#a855f7" : "#52525b",
+                strokeWidth: 1.8,
+              }}
+            />
+          </button>
+        </div>
 
         {/* Precio + Botón */}
         <div className="flex items-center justify-between mt-auto pt-2 border-t border-zinc-800/50">
@@ -264,7 +271,36 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [visibleCount, setVisibleCount] = useState(8)
   const searchRef = useRef<HTMLInputElement>(null)
+  const { getIdToken } = useAuth();
   const cart = useProductCart()
+
+  const handleFavoriteItem = useCallback(async (idProducto: number) => {
+    const idToken = await getIdToken();
+    if (!idToken) return;
+    try {
+      await AddFavoriteItem(idToken, { idProducto });
+    } catch (error) {
+      console.error("Error al agregar a favoritos:", error);
+    }
+  }, [getIdToken]);
+
+
+
+  const handleAddToCart = useCallback(async (idProducto: number, cantidad: number) => {
+    const idToken = await getIdToken();
+    if (!idToken) return;
+    try {
+      await AddToCart(idToken, { idProducto, cantidad });
+    } catch (error) {
+      console.error("Error al agregar al carrito:", error);
+    }
+  }, [getIdToken]);
+
+  const confirmAndAdd = useCallback((id: number) => {
+    cart.confirm(id);
+    handleAddToCart(id, cart.getQty(id));
+  }, [cart, handleAddToCart]);
+
 
   useEffect(() => {
     const load = async () => {
@@ -308,7 +344,7 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
     <section className="w-full bg-black py-16 relative overflow-hidden">
 
       {/* Fondo de grid sutil */}
-      
+
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
@@ -502,7 +538,8 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
                 loaded={!loading}
                 activeCart={cart.activeCart}
                 onOpenCart={cart.openCart}
-                onConfirm={cart.confirm}
+                onConfirm={confirmAndAdd}
+                onFavorite={handleFavoriteItem}
                 onIncrease={cart.increase}
                 onDecrease={cart.decrease}
                 qty={cart.getQty(product.id)}

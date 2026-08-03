@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Plus, Minus, Trash2, ShoppingCart, ImageOff, ArrowLeft, Tag } from "lucide-react";
 import { GetUserCart, cartItems } from "@/src/actions/cart/get-user-cart";
 import { formatMoney } from "@/src/utils/formatMoney";
-
+import { useAuth } from "@/src/context/AuthContext";
 // ─── SKELETON ────────────────────────────────────────────────────────────────
 function CartSkeleton() {
     return (
@@ -79,13 +79,15 @@ function CartRow({
             }}
         >
             {/* Imagen */}
+            <Link href={`/products/${item.idProducto}`} >
             <div className="relative aspect-square bg-zinc-900 overflow-hidden shrink-0">
                 {item.imagen ? (
                     <Image
                         src={item.imagen}
                         alt={item.nombre}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    
+                        className="object-contain transition-transform duration-500 group-hover:scale-105"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -99,15 +101,17 @@ function CartRow({
                     style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }}
                 />
             </div>
-
+            </Link>
             {/* Info */}
             <div className="flex flex-col gap-1 min-w-0">
+            <Link href={`/products/${item.idProducto}`} >
                 <p
                     className="text-white leading-tight line-clamp-2"
                     style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.05rem", letterSpacing: "0.04em" }}
                 >
                     {item.nombre}
                 </p>
+                </Link>
                 <p
                     className="text-[#c8ff00]"
                     style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.2rem", letterSpacing: "0.02em" }}
@@ -168,20 +172,27 @@ export default function Cart() {
     const [items, setItems] = useState<cartItems[]>([]);
     const [loaded, setLoaded] = useState(false);
     const [checkedOut, setCheckedOut] = useState(false);
-
-    useEffect(() => {
-        const fetch = async () => {
-            try {
-                const data = await GetUserCart();
-                setItems(data);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                setTimeout(() => setLoaded(true), 80);
-            }
-        };
-        fetch();
+    const { getIdToken } = useAuth();
+    // get cart information
+    const fetchDataCart = useCallback(async (idToken: string) => {
+        try {
+            const data = await GetUserCart(idToken);
+            setItems(data);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setTimeout(() => setLoaded(true), 500);
+        }
     }, []);
+
+    //get idToken and fetch cart data when user state changes
+    useEffect(() => {
+        (async () => {
+            const idToken = await getIdToken();
+            if(!idToken) { setLoaded(true); return; }
+            await fetchDataCart(idToken);
+        })();
+    },[getIdToken, fetchDataCart])
 
     const increase = (id: number) =>
         setItems((prev) => prev.map((i) => i.id === id ? { ...i, cantidad: i.cantidad + 1 } : i));

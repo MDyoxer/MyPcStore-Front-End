@@ -1,12 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { auth } from "@/src/lib/firebase/config";
-
 type AuthContextType = {
   user: User | null;
   loading: boolean;
+  getIdToken: ()=> Promise<string | null>;
   signOutUser: () => Promise<void>;
 };
 
@@ -24,12 +24,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
+  const getIdToken = useCallback(async ():Promise<string | null> => {
+    if(!user){
+      return null;
+    }
+    return user.getIdToken();
+  },[user]);
+
   const signOutUser = async () => {
     await signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signOutUser }}>
+    <AuthContext.Provider value={{ user, loading, getIdToken, signOutUser }}>
       {children}
     </AuthContext.Provider>
   );

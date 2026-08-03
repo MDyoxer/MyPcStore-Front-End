@@ -1,5 +1,5 @@
 "use client";
-import {Zap, Shield, Microscope} from "lucide-react";
+import { Zap, Shield, Microscope } from "lucide-react";
 import Image from "next/image";
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
