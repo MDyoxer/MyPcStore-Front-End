@@ -37,7 +37,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Para estilos únicos usa `className` de Tailwind directamente; no escribas CSS personalizado salvo en `globals.css`.
 
 ## API y Backend
-- `src/utils/BaseApiUrl.ts` exporta `getApiBaseUrl()` (lee `NEXT_PUBLIC_MY_PC_STORE_API_BASE_URL`, default `http://localhost:3003`) y `buildApiUrl(path)` para construir URLs.
+- `src/utils/baseApiUrl.ts` exporta `getApiBaseUrl()` (lee `NEXT_PUBLIC_MY_PC_STORE_API_BASE_URL`, default `http://localhost:3003`) y `buildApiUrl(path)` para construir URLs.
 - Las actions en `src/actions/` deben importar `buildApiUrl` para llamar al backend.
 - `src/actions/products/get-all-products.ts` contiene el tipo `Product` (`id`, `categoria`, `marca`, `nombre`, `precio`, `imagen`) y `GetProducts()`.
 
@@ -56,14 +56,14 @@ src/
 ├── context/       # Context providers (vacío)
 ├── hooks/         # Custom hooks (vacío)
 ├── lib/           # Servicios externos (firebase/config)
-└── utils/         # Funciones reutilizables (BaseApiUrl, FormatMoney)
+└── utils/         # Funciones reutilizables (baseApiUrl, formatMoney)
 ```
 
 ## Convenciones de Código
 - **Modularización**: Cada feature en su propia carpeta. Componentes grandes dividirlos en subcomponentes.
 - **Server Actions**: Colocar en `src/actions/<entidad>/`. Usar `"use client"` o `"use server"` según corresponda.
 - **Funciones reutilizables**: Si una función puede usarse en múltiples módulos, va en `src/utils/`.
-- **Formateo de moneda**: Usar `formatMoney` de `src/utils/FormatMoney.ts` que formatea en MXN.
+- **Formateo de moneda**: Usar `formatMoney` de `src/utils/formatMoney.ts` que formatea en MXN.
 - **Tipado**: No usar `any` sin justificarlo. Definir tipos en el archivo de action correspondiente o en `src/types/` si se comparten.
 - **Imágenes**: Usar `next/image` con `remotePatterns` configurado en `next.config.ts` para Firebase Storage. Para imágenes locales, usar la carpeta `public/`.
 - **Rutas vacías**: Las páginas scaffolded sin implementar deben dejarse vacías o con placeholder text.
