@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -13,10 +12,12 @@ import {
   Layers,
   CheckCircle2,
   XCircle,
+  Heart,
 } from "lucide-react";
 import { GetOneProduct, Product } from "@/src/actions/products/get-one-product";
 import { useState, useEffect } from "react";
 import { formatMoney } from "@/src/utils/formatMoney";
+import { useProductAction } from "@/src/hooks/useProductAction";
 
 // ─── BADGE DE STOCK ──────────────────────────────────────────────────────────
 function StockBadge({ stock }: { stock: number }) {
@@ -61,7 +62,7 @@ function QuantitySelector({
   max,
 }: {
   qty: number;
-  onIncrease: () => void;
+  onIncrease: (maxStock: number) => void;
   onDecrease: () => void;
   max: number;
 }) {
@@ -82,7 +83,7 @@ function QuantitySelector({
         {qty}
       </span>
       <button
-        onClick={onIncrease}
+        onClick={() => onIncrease(max)}
         disabled={qty >= max}
         aria-label="Aumentar cantidad"
         className="flex items-center justify-center w-10 h-10 text-zinc-500 hover:text-[#c8ff00] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
@@ -160,7 +161,10 @@ export default function ProductDetails({ id }: { id: number }) {
   const [loaded, setLoaded] = useState(false);
   const [qty, setQty] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
-
+  const [liked, setLiked] = useState(false)
+  const { handleFavoriteItem, handleAddToCart } = useProductAction();
+  
+  
   useEffect(() => {
     const load = async () => {
       const data = await GetOneProduct(id);
@@ -170,7 +174,8 @@ export default function ProductDetails({ id }: { id: number }) {
     load();
   }, [id]);
 
-  const handleAddToCart = () => {
+  const handleAddToCartClick = async () => {
+    await handleAddToCart(id, qty);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
@@ -282,10 +287,30 @@ export default function ProductDetails({ id }: { id: number }) {
                       {product.categoria}
                     </span>
                     <span className="text-[#c8ff00] opacity-40">✦</span>
+
                   </>
                 )}
                 {product.marca && (
-                  <span>{product.marca}</span>
+                  <>
+                    <span>{product.marca}</span>
+                    <button
+                      onClick={() => {
+                        setLiked((v) => !v);
+                        handleFavoriteItem(product.id);
+                      }}
+                      aria-label={liked ? "Quitar de favoritos" : "Agregar a favoritos"}
+                      className="shrink-0 mt-0.5 transition-transform duration-200 active:scale-90"
+                    >
+                      <Heart
+                        className="w-4.5 h-4.5 transition-colors duration-200"
+                        style={{
+                          fill: liked ? "#a855f7" : "transparent",
+                          stroke: liked ? "#a855f7" : "#52525b",
+                          strokeWidth: 2.8,
+                        }}
+                      />
+                    </button>
+                  </>
                 )}
               </div>
 
@@ -338,7 +363,7 @@ export default function ProductDetails({ id }: { id: number }) {
 
               <QuantitySelector
                 qty={qty}
-                onIncrease={() => setQty((q) => Math.min(q + 1, product.stock))}
+                onIncrease={(maxStock) => setQty((q) => Math.min(q + 1, maxStock))}
                 onDecrease={() => setQty((q) => Math.max(q - 1, 1))}
                 max={product.stock}
               />
@@ -369,15 +394,15 @@ export default function ProductDetails({ id }: { id: number }) {
 
                 {/* Agregar al carrito */}
                 <button
-                  onClick={handleAddToCart}
+                  onClick={handleAddToCartClick}
                   disabled={outOfStock}
                   className={`flex-1 flex items-center justify-center gap-2 border
                               disabled:opacity-30 disabled:cursor-not-allowed
                               active:scale-[0.98] transition-all duration-300
                               ${addedToCart
-                                ? "border-[#c8ff00] text-[#c8ff00] bg-[#c8ff00]/5"
-                                : "border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white bg-transparent"
-                              }`}
+                      ? "border-[#c8ff00] text-[#c8ff00] bg-[#c8ff00]/5"
+                      : "border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white bg-transparent"
+                    }`}
                   style={{
                     fontFamily: "'Space Mono', monospace",
                     fontSize: "11px",

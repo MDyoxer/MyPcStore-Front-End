@@ -8,6 +8,7 @@ export type Products = {
     nombre: string,
     precio: number,
     imagen: string,
+    stock: number,
 }
 
 

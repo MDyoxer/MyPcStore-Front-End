@@ -2,13 +2,11 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { AddFavoriteItem } from "@/src/actions/favorites/add-favorite"
-import { AddToCart } from "@/src/actions/cart/add-to-cart"
 import { ShoppingCart, ImageOff, Check, Plus, Minus, SlidersHorizontal, Search, X, Heart } from "lucide-react"
 import { GetProducts, Products } from "@/src/actions/products/get-all-products"
 import { useState, useEffect, useCallback, useRef } from "react"
-import { useAuth } from "@/src/context/AuthContext"
 import { formatMoney } from "@/src/utils/formatMoney"
+import { useProductAction } from "@/src/hooks/useProductAction"
 // ─── TIPOS ───────────────────────────────────────────────────────────────────
 type SortKey = "default" | "price-asc" | "price-desc" | "name"
 
@@ -19,10 +17,14 @@ function useProductCart() {
   const [cartItems, setCartItems] = useState<Record<number, boolean>>({})
   const getQty = useCallback((id: number) => quantities[id] ?? 1, [quantities])
 
-  const increase = (id: number) =>
-    setQuantities((prev) => ({ ...prev, [id]: (prev[id] ?? 1) + 1 }))
+  const increase = useCallback((id: number, maxStock: number) =>
+    setQuantities((prev) => ({
+      ...prev,
+      [id]: Math.min((prev[id] ?? 1) + 1, maxStock),
+    })),
+  [])
 
-  const decrease = (id: number) =>
+  const decrease = useCallback((id: number) =>
     setQuantities((prev) => {
       const next = (prev[id] ?? 1) - 1
       if (next <= 0) {
@@ -31,16 +33,17 @@ function useProductCart() {
         return { ...prev, [id]: 1 }
       }
       return { ...prev, [id]: next }
-    })
+    }),
+  [])
 
-  const confirm = (id: number) => {
+  const confirm = useCallback((id: number) => {
     setCartItems((c) => ({ ...c, [id]: true }))
     setActiveCart(null)
-  }
+  }, [])
 
-  const openCart = (id: number) => {
+  const openCart = useCallback((id: number) => {
     setActiveCart(id)
-  }
+  }, [])
 
   return { activeCart, openCart, confirm, getQty, increase, decrease, cartItems }
 }
@@ -65,7 +68,7 @@ function ProductCard({
   activeCart: number | null
   onOpenCart: (id: number) => void
   onConfirm: (id: number) => void
-  onIncrease: (id: number) => void
+  onIncrease: (id: number, maxStock: number) => void
   onDecrease: (id: number) => void
   onFavorite: (id: number) => void
   qty: number
@@ -232,7 +235,7 @@ function ProductCard({
               <span className="w-px h-5 bg-zinc-700" />
 
               <button
-                onClick={() => onIncrease(product.id)}
+                onClick={() => onIncrease(product.id, product.stock)}
                 aria-label="Aumentar"
                 className="flex items-center justify-center w-6 h-6 text-zinc-400 hover:text-[#c8ff00] transition-colors"
               >
@@ -271,35 +274,11 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [visibleCount, setVisibleCount] = useState(8)
   const searchRef = useRef<HTMLInputElement>(null)
-  const { getIdToken } = useAuth();
   const cart = useProductCart()
-
-  const handleFavoriteItem = useCallback(async (idProducto: number) => {
-    const idToken = await getIdToken();
-    if (!idToken) return;
-    try {
-      await AddFavoriteItem(idToken, { idProducto });
-    } catch (error) {
-      console.error("Error al agregar a favoritos:", error);
-    }
-  }, [getIdToken]);
-
-
-
-  const handleAddToCart = useCallback(async (idProducto: number, cantidad: number) => {
-    const idToken = await getIdToken();
-    if (!idToken) return;
-    try {
-      await AddToCart(idToken, { idProducto, cantidad });
-    } catch (error) {
-      console.error("Error al agregar al carrito:", error);
-    }
-  }, [getIdToken]);
-
-  const confirmAndAdd = useCallback((id: number) => {
-    cart.confirm(id);
-    handleAddToCart(id, cart.getQty(id));
-  }, [cart, handleAddToCart]);
+  const { handleFavoriteItem, confirmAndAdd } = useProductAction({
+    onConfirmCart: cart.confirm,
+    getQuantity: cart.getQty,
+  })
 
 
   useEffect(() => {
@@ -572,7 +551,7 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
           )}
 
           <Link
-            href="/productos"
+            href="/allProducts"
             className="group inline-flex items-center gap-2 border border-zinc-700 text-zinc-400 px-6 py-3
                        hover:border-[#c8ff00]/50 hover:text-[#c8ff00] transition-all duration-300 ml-auto"
             style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase" }}
