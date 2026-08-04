@@ -7,7 +7,9 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Plus, Minus, Trash2, ShoppingCart, ImageOff, ArrowLeft, Tag } from "lucide-react";
 import { GetUserCart, cartItems } from "@/src/actions/cart/get-user-cart";
 import { DeleteItemCart } from "@/src/actions/cart/delete-item-cart";
+import { UpdateCartQuantity } from "@/src/actions/cart/update-cart-quantity";
 import { formatMoney } from "@/src/utils/formatMoney";
+import { slugify } from "@/src/utils/slugify";
 import { useAuth } from "@/src/context/AuthContext";
 // ─── ESTADO VACÍO ────────────────────────────────────────────────────────────
 function EmptyCart() {
@@ -70,7 +72,7 @@ function CartRow({
             }}
         >
             {/* Imagen */}
-            <Link href={`/products/${item.idProducto}`} >
+            <Link href={`/products/${slugify(item.nombre)}`} >
                 <div className="relative aspect-square bg-zinc-900 overflow-hidden shrink-0">
                     {item.imagen ? (
                         <Image
@@ -95,7 +97,7 @@ function CartRow({
             </Link>
             {/* Info */}
             <div className="flex flex-col gap-1 min-w-0">
-                <Link href={`/products/${item.idProducto}`} >
+                <Link href={`/products/${slugify(item.nombre)}`} >
                     <p
                         className="text-white leading-tight line-clamp-2"
                         style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.05rem", letterSpacing: "0.04em" }}
@@ -181,6 +183,7 @@ export default function Cart() {
     const [loaded, setLoaded] = useState(false);
     const [checkedOut, setCheckedOut] = useState(false);
     const { getIdToken } = useAuth();
+    const quantityTimersRef = useRef<Record<number, ReturnType<typeof setTimeout> | undefined>>({});
     // get cart information
     const fetchDataCart = useCallback(async (idToken: string) => {
         try {
@@ -202,14 +205,44 @@ export default function Cart() {
         })();
     }, [getIdToken, fetchDataCart])
 
-    const increase = (id: number) => {
+    useEffect(() => {
+        return () => {
+            Object.values(quantityTimersRef.current).forEach((timer) => {
+                if (timer) clearTimeout(timer);
+            });
+        };
+    }, []);
+
+    const syncItemQuantity = useCallback((item: cartItems, quantity: number) => {
+        const existingTimer = quantityTimersRef.current[item.idProducto];
+        if (existingTimer) {
+            clearTimeout(existingTimer);
+        }
+
+        quantityTimersRef.current[item.idProducto] = setTimeout(async () => {
+            try {
+                const idToken = await getIdToken();
+                if (!idToken) return;
+                await UpdateCartQuantity(idToken, {
+                    idProducto: item.idProducto,
+                    cantidad: quantity,
+                });
+            } catch (error) {
+                console.error("Error al actualizar la cantidad del carrito:", error);
+            }
+        }, 500);
+    }, [getIdToken]);
+
+    const increase = (idCart: number) => {
         setItems((prev) =>
-            prev.map((i) => {
-                if (i.idCarrito=== id) {
-                    const nuevaCantidad = Math.min(i.cantidad + 1, i.stock);
-                    return { ...i, cantidad: nuevaCantidad };
+            prev.map((item) => {
+                if (item.idCarrito !== idCart) return item;
+
+                const nextQuantity = Math.min(item.cantidad + 1, item.stock);
+                if (nextQuantity !== item.cantidad) {
+                    syncItemQuantity(item, nextQuantity);
                 }
-                return i;
+                return { ...item, cantidad: nextQuantity };
             })
         );
     };
@@ -222,12 +255,27 @@ export default function Cart() {
             handleRemoveItem(idCart);
         } else {
             setItems((prev) =>
-                prev.map((i) => (i.idCarrito === idCart ? { ...i, cantidad: i.cantidad - 1 } : i))
+                prev.map((item) => {
+                    if (item.idCarrito !== idCart) return item;
+
+                    const nextQuantity = item.cantidad - 1;
+                    syncItemQuantity(item, nextQuantity);
+                    return { ...item, cantidad: nextQuantity };
+                })
             );
         }
     };
 
     const handleRemoveItem = useCallback(async (idCart: number) => {
+        const targetItem = items.find((item) => item.idCarrito === idCart);
+        if (targetItem) {
+            const pendingTimer = quantityTimersRef.current[targetItem.idProducto];
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                delete quantityTimersRef.current[targetItem.idProducto];
+            }
+        }
+
         setItems((prev) => prev.filter((item) => item.idCarrito !== idCart));
 
         try {

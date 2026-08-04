@@ -6,6 +6,7 @@ import { ShoppingCart, ImageOff, Check, Plus, Minus, SlidersHorizontal, Search, 
 import { GetProducts, Products } from "@/src/actions/products/get-all-products"
 import { useState, useEffect, useCallback, useRef } from "react"
 import { formatMoney } from "@/src/utils/formatMoney"
+import { slugify } from "@/src/utils/slugify"
 import { useProductAction } from "@/src/hooks/useProductAction"
 // ─── TIPOS ───────────────────────────────────────────────────────────────────
 type SortKey = "default" | "price-asc" | "price-desc" | "name"
@@ -105,7 +106,7 @@ function ProductCard({
       {/* Imagen */}
       <div className="relative aspect-4/3 overflow-hidden bg-zinc-900">
         {product.imagen ? (
-          <Link href={`/products/${product.id}`}>
+          <Link href={`/products/${slugify(product.nombre)}`}>
             <Image
               src={product.imagen}
               alt={product.nombre}
@@ -161,7 +162,7 @@ function ProductCard({
             className="text-white leading-tight line-clamp-2  transition-colors duration-300"
             style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.15rem", letterSpacing: "0.04em" }}
           >
-            <Link href={`/products/${product.id}`}>
+            <Link href={`/products/${slugify(product.nombre)}`}>
               {product.nombre}
             </Link>
           </h3>

@@ -11,6 +11,7 @@ import { GetCategories, Categories } from "@/src/actions/categories/get-all-cate
 import { GetProducts, Products } from "@/src/actions/products/get-all-products";
 import { GetBrands, Brands } from "@/src/actions/brands/get-all-brands";
 import { formatMoney } from "@/src/utils/formatMoney";
+import { slugify } from "@/src/utils/slugify";
 import LoadingScreen from "@/src/components/ui/loading";
 import { useProductAction } from "@/src/hooks/useProductAction";
 
@@ -86,7 +87,7 @@ function ProductCard({
       <div className="relative aspect-4/3 overflow-hidden bg-zinc-900">
 
         {product.imagen ? (
-          <Link href={`/products/${product.id}`}>
+          <Link href={`/products/${slugify(product.nombre)}`}>
             <Image src={product.imagen} alt={product.nombre} width={400} height={300}
               className="w-full h-full object-contain transition-transform duration-700 ease-out group-hover:scale-105" />
           </Link>
@@ -118,7 +119,7 @@ function ProductCard({
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-white leading-tight line-clamp-2 group-hover:text-[#c8ff00] transition-colors duration-300"
             style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.1rem", letterSpacing: "0.04em" }}>
-            <Link href={`/products/${product.id}`}>{product.nombre}</Link>
+            <Link href={`/products/${slugify(product.nombre)}`}>{product.nombre}</Link>
           </h3>
           <button onClick={() => {
             setLiked((v) => !v);

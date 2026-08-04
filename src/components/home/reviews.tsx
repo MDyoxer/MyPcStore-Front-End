@@ -115,7 +115,7 @@ export default function Reviews() {
           {TRACK.map((r, i) => (
             <article
               key={i}
-              className="flex-shrink-0 w-[340px] flex flex-col gap-5 bg-zinc-950 border border-zinc-800/60 p-7 relative overflow-hidden group
+              className="shrink-0 w-85 flex flex-col gap-5 bg-zinc-950 border border-zinc-800/60 p-7 relative overflow-hidden group
                          hover:border-zinc-700/60 transition-colors duration-300"
               style={{
                 clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
@@ -124,7 +124,7 @@ export default function Reviews() {
               {/* Acento esquina */}
               <span
                 aria-hidden
-                className="absolute top-0 right-0 w-[14px] h-[14px] transition-colors duration-300"
+                className="absolute top-0 right-0 w-3.5 h-3.5 transition-colors duration-300"
                 style={{
                   background: r.color,
                   clipPath: "polygon(0 0, 100% 100%, 100% 0)",
@@ -134,7 +134,7 @@ export default function Reviews() {
               {/* Línea inferior en hover */}
               <div
                 aria-hidden
-                className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500"
+                className="absolute bottom-0 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-500"
                 style={{ background: r.color, boxShadow: `0 0 8px ${r.color}` }}
               />
 
@@ -160,7 +160,7 @@ export default function Reviews() {
               <div className="flex items-center gap-3">
                 {/* Avatar */}
                 <div
-                  className="flex-shrink-0 w-10 h-10 flex items-center justify-center border"
+                  className="shrink-0 w-10 h-10 flex items-center justify-center border"
                   style={{
                     fontFamily: "'Bebas Neue', sans-serif",
                     fontSize: "1rem",
@@ -191,7 +191,7 @@ export default function Reviews() {
 
                 {/* Product tag */}
                 <span
-                  className="ml-auto flex-shrink-0 px-2 py-0.5 text-black"
+                  className="ml-auto shrink-0 px-2 py-0.5 text-black"
                   style={{
                     fontFamily: "'Space Mono', monospace",
                     fontSize: "8px",
