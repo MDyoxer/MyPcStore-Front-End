@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Loading from "../ui/loading";
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Plus, Minus, Trash2, ShoppingCart, ImageOff, ArrowLeft, Tag } from "lucide-react";
 import { GetUserCart, cartItems } from "@/src/actions/cart/get-user-cart";
@@ -181,8 +182,9 @@ function CartRow({
 export default function Cart() {
     const [items, setItems] = useState<cartItems[]>([]);
     const [loaded, setLoaded] = useState(false);
-    const [checkedOut, setCheckedOut] = useState(false);
+   
     const { getIdToken } = useAuth();
+    const router = useRouter();
     const quantityTimersRef = useRef<Record<number, ReturnType<typeof setTimeout> | undefined>>({});
     // get cart information
     const fetchDataCart = useCallback(async (idToken: string) => {
@@ -461,7 +463,7 @@ export default function Cart() {
 
                             {/* Botón pagar */}
                             <button
-                                onClick={() => setCheckedOut(true)}
+                                onClick={() => router.push("/checkout")}
                                 className="w-full flex items-center justify-center gap-2 bg-[#c8ff00] text-black
                            hover:bg-purple-600 active:scale-[0.98] transition-all duration-200 py-4"
                                 style={{
@@ -474,7 +476,7 @@ export default function Cart() {
                                     boxShadow: "0 0 24px -6px rgba(200,255,0,0.4)",
                                 }}
                             >
-                                {checkedOut ? "Procesando..." : "Comprar ahora →"}
+                                Pagar ahora 
                             </button>
 
                             {/* Seguir comprando */}

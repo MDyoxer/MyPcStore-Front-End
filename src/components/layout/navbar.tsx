@@ -8,11 +8,11 @@ const navLinks = [
   { label: "Productos", href: "/allProducts" },
   { label: "Equipos", href: "/" },
   { label: "Hardware", href: "/" },
-  { label: "Mis compras", href: "/" },
+  { label: "Mis ordenes", href: "/orders" },
   { label: "Arma tu PC", href: "/" },
   { label: "Promociones", href: "/" },
-  { label: "Nosotros", href: "/" },
-  { label: "Contacto", href: "/" },
+  { label: "Nosotros", href: "/about" },
+  { label: "Contacto", href: "/contact" },
 ];
 
 export default function Navbar() {
