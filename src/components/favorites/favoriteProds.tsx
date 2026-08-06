@@ -9,6 +9,7 @@ import { DeleteFavorite } from "@/src/actions/favorites/delete-favorite";
 import { useAuth } from "@/src/context/AuthContext";
 import { formatDateTime } from "@/src/utils/formatDateTime";
 import { formatMoney } from "@/src/utils/formatMoney";
+import { slugify } from "@/src/utils/slugify";
 import Loading from "../ui/loading";
 
 type SortKey = "date-desc" | "date-asc" | "name-asc" | "name-desc" | "price-asc" | "price-desc";
@@ -54,7 +55,7 @@ function FavRow({
       </span>
       {/* TODO: imagen y titulo deben mandar a product id */}
       {/* Imagen */}
-        <Link href={`/products/${item.idProd}`}>
+        <Link href={`/products/${slugify(item.nombre)}`}>
       <div className="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-zinc-900 overflow-hidden"
         style={{ clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))" }}>
         {item.imagen ? (
@@ -76,7 +77,7 @@ function FavRow({
           <span>{item.marca}</span>
         </div>
 
-        <Link href={`/products/${item.idProd}`}
+        <Link href={`/products/${slugify(item.nombre)}`}
           className="text-white hover:text-[#c8ff00] transition-colors duration-200 leading-tight line-clamp-1"
           style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.45rem", letterSpacing: "0.04em" }}>
           {item.nombre}
@@ -274,8 +275,8 @@ export default function FavoriteProducts() {
         {favItems.length === 0 ? (
           // Estado vacío
           <div className="flex flex-col items-center justify-center py-32 gap-6 border border-zinc-800/40">
-            <Heart className="w-12 h-12 text-zinc-800" />
-            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(4rem, 10vw, 7rem)", color: "transparent", WebkitTextStroke: "1px rgba(168,85,247,0.15)" }}>
+            <Heart className="w-12 h-12 text-zinc-900" />
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(4rem, 10vw, 7rem)", color: "white", WebkitTextStroke: "1px rgba(168,85,247,0.15)" }}>
               VACÍO
             </span>
             <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#52525b" }}>

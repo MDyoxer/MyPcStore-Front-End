@@ -2,22 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import Loading from "../ui/loading";
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Plus, Minus, Trash2, ShoppingCart, ImageOff, ArrowLeft, Tag } from "lucide-react";
 import { GetUserCart, cartItems } from "@/src/actions/cart/get-user-cart";
+import { DeleteItemCart } from "@/src/actions/cart/delete-item-cart";
+import { UpdateCartQuantity } from "@/src/actions/cart/update-cart-quantity";
 import { formatMoney } from "@/src/utils/formatMoney";
+import { slugify } from "@/src/utils/slugify";
 import { useAuth } from "@/src/context/AuthContext";
-// ─── SKELETON ────────────────────────────────────────────────────────────────
-function CartSkeleton() {
-    return (
-        <div className="animate-pulse flex flex-col gap-3">
-            {[1, 2, 3].map((i) => (
-                <div key={i} className="flex gap-4 p-4 bg-zinc-900 border border-zinc-800/60 h-28" />
-            ))}
-        </div>
-    );
-}
-
 // ─── ESTADO VACÍO ────────────────────────────────────────────────────────────
 function EmptyCart() {
     return (
@@ -79,38 +73,38 @@ function CartRow({
             }}
         >
             {/* Imagen */}
-            <Link href={`/products/${item.idProducto}`} >
-            <div className="relative aspect-square bg-zinc-900 overflow-hidden shrink-0">
-                {item.imagen ? (
-                    <Image
-                        src={item.imagen}
-                        alt={item.nombre}
-                        fill
-                    
-                        className="object-contain transition-transform duration-500 group-hover:scale-105"
+            <Link href={`/products/${slugify(item.nombre)}`} >
+                <div className="relative aspect-square bg-zinc-900 overflow-hidden shrink-0">
+                    {item.imagen ? (
+                        <Image
+                            src={item.imagen}
+                            alt={item.nombre}
+                            fill
+
+                            className="object-contain transition-transform duration-500 group-hover:scale-105"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                            <ImageOff className="w-5 h-5 text-zinc-700" />
+                        </div>
+                    )}
+                    {/* Acento esquina */}
+                    <span
+                        aria-hidden
+                        className="absolute top-0 right-0 w-[w-2] h-[h-2] bg-[#c8ff00]"
+                        style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }}
                     />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                        <ImageOff className="w-5 h-5 text-zinc-700" />
-                    </div>
-                )}
-                {/* Acento esquina */}
-                <span
-                    aria-hidden
-                    className="absolute top-0 right-0 w-[w-2] h-[h-2] bg-[#c8ff00]"
-                    style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }}
-                />
-            </div>
+                </div>
             </Link>
             {/* Info */}
             <div className="flex flex-col gap-1 min-w-0">
-            <Link href={`/products/${item.idProducto}`} >
-                <p
-                    className="text-white leading-tight line-clamp-2"
-                    style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.05rem", letterSpacing: "0.04em" }}
-                >
-                    {item.nombre}
-                </p>
+                <Link href={`/products/${slugify(item.nombre)}`} >
+                    <p
+                        className="text-white leading-tight line-clamp-2"
+                        style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.05rem", letterSpacing: "0.04em" }}
+                    >
+                        {item.nombre}
+                    </p>
                 </Link>
                 <p
                     className="text-[#c8ff00]"
@@ -124,6 +118,23 @@ function CartRow({
                 >
                     Subtotal: {formatMoney(item.precio * item.cantidad)}
                 </p>
+                {item.stock <= 5 ? (
+
+                    <p
+                        className="text-red-600"
+                        style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" }}
+                    >
+                        ¡Ultimas {item.stock} unidades disponibles!
+                    </p>
+                ) : (
+                    <p
+                        className="text-zinc-400"
+                        style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" }}
+                    >
+                        Unidades disponibles: {item.stock}
+                    </p>
+
+                )}
             </div>
 
             {/* Cantidad + eliminar */}
@@ -131,7 +142,7 @@ function CartRow({
                 {/* Selector */}
                 <div className="flex items-center border border-zinc-700/80 bg-zinc-900">
                     <button
-                        onClick={() => onDecrease(item.id)}
+                        onClick={() => onDecrease(item.idCarrito)}
                         aria-label="Reducir"
                         className="flex items-center justify-center w-8 h-8 text-zinc-500 hover:text-[#c8ff00] transition-colors"
                     >
@@ -144,7 +155,7 @@ function CartRow({
                         {item.cantidad}
                     </span>
                     <button
-                        onClick={() => onIncrease(item.id)}
+                        onClick={() => onIncrease(item.idCarrito)}
                         aria-label="Aumentar"
                         className="flex items-center justify-center w-8 h-8 text-zinc-500 hover:text-[#c8ff00] transition-colors"
                     >
@@ -154,7 +165,7 @@ function CartRow({
 
                 {/* Eliminar */}
                 <button
-                    onClick={() => onRemove(item.id)}
+                    onClick={() => onRemove(item.idCarrito)}
                     aria-label="Eliminar producto"
                     className="flex items-center gap-1 text-zinc-500 hover:text-red-500 transition-colors duration-200"
                     style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.1em", textTransform: "uppercase" }}
@@ -171,8 +182,10 @@ function CartRow({
 export default function Cart() {
     const [items, setItems] = useState<cartItems[]>([]);
     const [loaded, setLoaded] = useState(false);
-    const [checkedOut, setCheckedOut] = useState(false);
+   
     const { getIdToken } = useAuth();
+    const router = useRouter();
+    const quantityTimersRef = useRef<Record<number, ReturnType<typeof setTimeout> | undefined>>({});
     // get cart information
     const fetchDataCart = useCallback(async (idToken: string) => {
         try {
@@ -189,26 +202,97 @@ export default function Cart() {
     useEffect(() => {
         (async () => {
             const idToken = await getIdToken();
-            if(!idToken) { setLoaded(true); return; }
+            if (!idToken) { setLoaded(true); return; }
             await fetchDataCart(idToken);
         })();
-    },[getIdToken, fetchDataCart])
+    }, [getIdToken, fetchDataCart])
 
-    const increase = (id: number) =>
-        setItems((prev) => prev.map((i) => i.id === id ? { ...i, cantidad: i.cantidad + 1 } : i));
+    useEffect(() => {
+        return () => {
+            Object.values(quantityTimersRef.current).forEach((timer) => {
+                if (timer) clearTimeout(timer);
+            });
+        };
+    }, []);
 
-    const decrease = (id: number) =>
+    const syncItemQuantity = useCallback((item: cartItems, quantity: number) => {
+        const existingTimer = quantityTimersRef.current[item.idProducto];
+        if (existingTimer) {
+            clearTimeout(existingTimer);
+        }
+
+        quantityTimersRef.current[item.idProducto] = setTimeout(async () => {
+            try {
+                const idToken = await getIdToken();
+                if (!idToken) return;
+                await UpdateCartQuantity(idToken, {
+                    idProducto: item.idProducto,
+                    cantidad: quantity,
+                });
+            } catch (error) {
+                console.error("Error al actualizar la cantidad del carrito:", error);
+            }
+        }, 500);
+    }, [getIdToken]);
+
+    const increase = (idCart: number) => {
         setItems((prev) =>
-            prev
-                .map((i) => i.id === id ? { ...i, cantidad: i.cantidad - 1 } : i)
-                .filter((i) => i.cantidad > 0)
-        );
+            prev.map((item) => {
+                if (item.idCarrito !== idCart) return item;
 
-    const remove = (id: number) =>
-        setItems((prev) => prev.filter((i) => i.id !== id));
+                const nextQuantity = Math.min(item.cantidad + 1, item.stock);
+                if (nextQuantity !== item.cantidad) {
+                    syncItemQuantity(item, nextQuantity);
+                }
+                return { ...item, cantidad: nextQuantity };
+            })
+        );
+    };
+
+    const decrease = (idCart: number) => {
+        const targetItem = items.find((i) => i.idCarrito === idCart);
+        if (!targetItem) return;
+        // Si la cantidad actual es 1, decrementar a 0 significa eliminarlo del carrito y de la BD
+        if (targetItem.cantidad <= 1) {
+            handleRemoveItem(idCart);
+        } else {
+            setItems((prev) =>
+                prev.map((item) => {
+                    if (item.idCarrito !== idCart) return item;
+
+                    const nextQuantity = item.cantidad - 1;
+                    syncItemQuantity(item, nextQuantity);
+                    return { ...item, cantidad: nextQuantity };
+                })
+            );
+        }
+    };
+
+    const handleRemoveItem = useCallback(async (idCart: number) => {
+        const targetItem = items.find((item) => item.idCarrito === idCart);
+        if (targetItem) {
+            const pendingTimer = quantityTimersRef.current[targetItem.idProducto];
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                delete quantityTimersRef.current[targetItem.idProducto];
+            }
+        }
+
+        setItems((prev) => prev.filter((item) => item.idCarrito !== idCart));
+
+        try {
+            const idToken = await getIdToken();
+            if (!idToken) return;
+            await DeleteItemCart(idToken, idCart);
+        } catch (error) {
+            console.error("Error al eliminar del carrito:", error);
+        }
+    }, [getIdToken]);
 
     const total = items.reduce((acc, i) => acc + i.precio * i.cantidad, 0);
     const totalItems = items.reduce((acc, i) => acc + i.cantidad, 0);
+
+
 
     return (
         <div className="w-full bg-black min-h-screen relative overflow-hidden">
@@ -283,7 +367,7 @@ export default function Cart() {
 
                 {/* ── CONTENIDO ── */}
                 {!loaded ? (
-                    <CartSkeleton />
+                    <Loading />
                 ) : items.length === 0 ? (
                     <EmptyCart />
                 ) : (
@@ -293,11 +377,11 @@ export default function Cart() {
                         <ul className="flex flex-col gap-2">
                             {items.map((item) => (
                                 <CartRow
-                                    key={item.id}
+                                    key={item.idCarrito}
                                     item={item}
                                     onIncrease={increase}
                                     onDecrease={decrease}
-                                    onRemove={remove}
+                                    onRemove={handleRemoveItem}
                                 />
                             ))}
                             <div className="flex flex-col items-start gap-1 pt-2 pl-1">
@@ -333,7 +417,7 @@ export default function Cart() {
                             {/* Desglose */}
                             <div className="flex flex-col gap-3">
                                 {items.map((item) => (
-                                    <div key={item.id} className="flex items-start justify-between gap-3">
+                                    <div key={item.idCarrito} className="flex items-start justify-between gap-3">
                                         <span
                                             className="text-zinc-400 line-clamp-1 flex-1"
                                             style={{ fontFamily: "'Space Mono', monospace", fontSize: "13px", letterSpacing: "0.05em" }}
@@ -379,7 +463,7 @@ export default function Cart() {
 
                             {/* Botón pagar */}
                             <button
-                                onClick={() => setCheckedOut(true)}
+                                onClick={() => router.push("/checkout")}
                                 className="w-full flex items-center justify-center gap-2 bg-[#c8ff00] text-black
                            hover:bg-purple-600 active:scale-[0.98] transition-all duration-200 py-4"
                                 style={{
@@ -392,7 +476,7 @@ export default function Cart() {
                                     boxShadow: "0 0 24px -6px rgba(200,255,0,0.4)",
                                 }}
                             >
-                                {checkedOut ? "Procesando..." : "Pagar ahora →"}
+                                Pagar ahora 
                             </button>
 
                             {/* Seguir comprando */}

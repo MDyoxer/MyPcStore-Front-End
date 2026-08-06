@@ -8,11 +8,11 @@ const navLinks = [
   { label: "Productos", href: "/allProducts" },
   { label: "Equipos", href: "/" },
   { label: "Hardware", href: "/" },
-  { label: "Mis compras", href: "/" },
+  { label: "Mis ordenes", href: "/orders" },
   { label: "Arma tu PC", href: "/" },
   { label: "Promociones", href: "/" },
-  { label: "Nosotros", href: "/" },
-  { label: "Contacto", href: "/" },
+  { label: "Nosotros", href: "/about" },
+  { label: "Contacto", href: "/contact" },
 ];
 
 export default function Navbar() {
@@ -98,7 +98,7 @@ export default function Navbar() {
                       <li className="border border-transparent rounded-lg mt-2 transition-all p-2
                    duration-200 hover:border-[#c8ff00] ">
                         <Link
-                          href="/"
+                          href="/orders"
                           onClick={() => setIsUserMenuOpen(false)}
                           className="flex items-center  px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 hover:rounded-sm transition-all duration-200"
                           style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}

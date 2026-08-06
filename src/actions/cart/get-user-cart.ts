@@ -1,11 +1,13 @@
 import { buildApiUrl } from "@/src/utils/baseApiUrl";
 export type cartItems={
-    id:number,
+    idCarrito:number,
     idProducto:number,
     cantidad:number,
     nombre:string,
     precio:number,
     imagen:string,
+    stock:number,
+    
 }
 export async function GetUserCart(idToken: string): Promise<cartItems[]> {
     const reponse = await fetch(buildApiUrl("/cart/userCart"), {

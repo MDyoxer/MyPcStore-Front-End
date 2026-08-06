@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-//import { AddToCart } from "@/src/actions/cart/add-to-cart";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   ShoppingCart, ImageOff, Check, Plus, Minus, Heart,
@@ -12,7 +11,9 @@ import { GetCategories, Categories } from "@/src/actions/categories/get-all-cate
 import { GetProducts, Products } from "@/src/actions/products/get-all-products";
 import { GetBrands, Brands } from "@/src/actions/brands/get-all-brands";
 import { formatMoney } from "@/src/utils/formatMoney";
+import { slugify } from "@/src/utils/slugify";
 import LoadingScreen from "@/src/components/ui/loading";
+import { useProductAction } from "@/src/hooks/useProductAction";
 
 // ─── TIPOS ───────────────────────────────────────────────────────────────────
 type SortKey = "default" | "price-asc" | "price-desc" | "name-asc" | "name-desc";
@@ -23,8 +24,15 @@ function useCart() {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [cartItems, setCartItems] = useState<Record<number, boolean>>({});
 
+
   const getQty = useCallback((id: number) => quantities[id] ?? 1, [quantities]);
-  const increase = (id: number) => setQuantities((p) => ({ ...p, [id]: (p[id] ?? 1) + 1 }));
+  const increase = useCallback((id: number, maxStock: number) =>
+    setQuantities((prev) => ({
+      ...prev,
+      [id]: Math.min((prev[id] ?? 1) + 1, maxStock),
+    })),
+    []);
+    
   const decrease = (id: number) =>
     setQuantities((p) => {
       const next = (p[id] ?? 1) - 1;
@@ -40,13 +48,16 @@ function useCart() {
 // ─── PRODUCT CARD (misma que TopProducts) ─────────────────────────────────────
 function ProductCard({
   product, index, loaded, activeCart,
-  onOpenCart, onConfirm, onIncrease, onDecrease, qty, inCart,
+  onOpenCart, onConfirm, onIncrease, onDecrease, onFavorite, qty, inCart,
 }: {
   product: Products; index: number; loaded: boolean;
   activeCart: number | null;
-  onOpenCart: (id: number) => void; onConfirm: (id: number) => void;
-  onIncrease: (id: number) => void; onDecrease: (id: number) => void;
+  onOpenCart: (id: number) => void;
+  onConfirm: (id: number) => void;
+  onIncrease: (id: number, maxStock: number) => void;
+  onDecrease: (id: number) => void;
   qty: number; inCart: boolean;
+  onFavorite: (id: number) => void
 }) {
   const isActive = activeCart === product.id;
   const [liked, setLiked] = useState(false);
@@ -76,7 +87,7 @@ function ProductCard({
       <div className="relative aspect-4/3 overflow-hidden bg-zinc-900">
 
         {product.imagen ? (
-         <Link href={`/products/${product.id}`}>
+          <Link href={`/products/${slugify(product.nombre)}`}>
             <Image src={product.imagen} alt={product.nombre} width={400} height={300}
               className="w-full h-full object-contain transition-transform duration-700 ease-out group-hover:scale-105" />
           </Link>
@@ -108,9 +119,12 @@ function ProductCard({
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-white leading-tight line-clamp-2 group-hover:text-[#c8ff00] transition-colors duration-300"
             style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.1rem", letterSpacing: "0.04em" }}>
-            <Link href={`/products/${product.id}`}>{product.nombre}</Link>
+            <Link href={`/products/${slugify(product.nombre)}`}>{product.nombre}</Link>
           </h3>
-          <button onClick={() => setLiked((v) => !v)} aria-label="Favorito"
+          <button onClick={() => {
+            setLiked((v) => !v);
+            onFavorite(product.id);
+          }} aria-label="Favorito"
             className="shrink-0 mt-0.5 active:scale-90 transition-transform duration-200">
             <Heart className="w-4.5 h-4.5 transition-colors duration-200"
               style={{ fill: liked ? "#a855f7" : "transparent", stroke: liked ? "#a855f7" : "#52525b", strokeWidth: 1.8 }} />
@@ -119,7 +133,7 @@ function ProductCard({
 
         {/* Precio + carrito */}
         <div className="flex items-center justify-between mt-auto pt-2 border-t border-zinc-800/50">
-          <span className="text-[#c8ff00]"
+          <span className="text-[#9e00c6]"
             style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.4rem", letterSpacing: "0.02em" }}>
             {formatMoney(product.precio)}
           </span>
@@ -146,7 +160,7 @@ function ProductCard({
                 <Check className="w-3.5 h-3.5 text-black" />
               </button>
               <span className="w-px h-5 bg-zinc-700" />
-              <button onClick={() => onIncrease(product.id)}
+              <button onClick={() => onIncrease(product.id, product.stock)}
                 className="flex items-center justify-center w-6 h-6 text-zinc-400 hover:text-[#c8ff00] transition-colors">
                 <Plus className="w-3.5 h-3.5" />
               </button>
@@ -244,8 +258,12 @@ export default function AllProducts() {
   const [sort, setSort] = useState<SortKey>("default");
   const [visibleCount, setVisibleCount] = useState(12);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const cart = useCart();
+
+  const { handleFavoriteItem, confirmAndAdd } = useProductAction({
+    onConfirmCart: cart.confirm,
+    getQuantity: cart.getQty,
+  });
 
   useEffect(() => {
     (async () => {
@@ -410,12 +428,11 @@ export default function AllProducts() {
            shrink-0 w-64 bg-zinc-950 border border-zinc-800/60 flex flex-col
              lg:top-6
             fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
-            transition-transform duration-300 ease-out overflow-y-auto
+            transition-transform duration-300 ease-out overflow-y-auto mpc-scrollbar
             lg:translate-x-0 lg:max-h-[calc(100vh-3rem)]
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           `}
             style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
-
             {/* Acento */}
             <span aria-hidden className="absolute top-0 right-0 w-3 h-3 bg-purple-500"
               style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }} />
@@ -593,9 +610,10 @@ export default function AllProducts() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-px bg-zinc-800/30">
                   {filtered.slice(0, visibleCount).map((product, i) => (
                     <ProductCard key={product.id} product={product} index={i} loaded={loaded}
-                      activeCart={cart.activeCart} onOpenCart={cart.openCart} onConfirm={cart.confirm}
+                      activeCart={cart.activeCart} onOpenCart={cart.openCart} onConfirm={confirmAndAdd}
                       onIncrease={cart.increase} onDecrease={cart.decrease}
-                      qty={cart.getQty(product.id)} inCart={!!cart.cartItems[product.id]} />
+                      qty={cart.getQty(product.id)} inCart={!!cart.cartItems[product.id]}
+                      onFavorite={handleFavoriteItem} />
                   ))}
                 </div>
 

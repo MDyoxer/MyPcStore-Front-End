@@ -5,7 +5,7 @@ import {  Mail, MapPin, Phone, ArrowUpRight, Cpu } from "lucide-react";
 
 const LINKS = {
   tienda: [
-    { label: "Catálogo", href: "/" },
+    { label: "Catálogo", href: "/allProducts" },
     { label: "Procesadores", href: "/" },
     { label: "Tarjetas de video", href: "/" },
     { label: "Memorias RAM", href: "/" },
@@ -94,7 +94,7 @@ export default function Footer() {
             <div className="flex flex-col gap-3">
               {CONTACT.map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-2.5">
-                  <Icon className="w-3.5 h-3.5 text-[#c8ff00] flex-shrink-0" />
+                  <Icon className="w-3.5 h-3.5 text-[#c8ff00] shrink-0" />
                   <span
                     className="text-zinc-500"
                     style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.05em" }}
@@ -123,7 +123,7 @@ export default function Footer() {
                     className="group flex items-center gap-1 text-zinc-600 hover:text-white transition-colors duration-200"
                     style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.08em" }}
                   >
-                    <span className="w-0 group-hover:w-3 h-px bg-[#c8ff00] transition-all duration-200 flex-shrink-0" />
+                    <span className="w-0 group-hover:w-3 h-px bg-[#c8ff00] transition-all duration-200 shrink-0" />
                     {l.label}
                   </Link>
                 </li>
@@ -148,7 +148,7 @@ export default function Footer() {
                     className="group flex items-center gap-1 text-zinc-600 hover:text-white transition-colors duration-200"
                     style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.08em" }}
                   >
-                    <span className="w-0 group-hover:w-3 h-px bg-[#c8ff00] transition-all duration-200 flex-shrink-0" />
+                    <span className="w-0 group-hover:w-3 h-px bg-[#c8ff00] transition-all duration-200 shrink-0" />
                     {l.label}
                   </Link>
                 </li>
@@ -173,7 +173,7 @@ export default function Footer() {
                     className="group flex items-center gap-1 text-zinc-600 hover:text-white transition-colors duration-200"
                     style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.08em" }}
                   >
-                    <span className="w-0 group-hover:w-3 h-px bg-[#c8ff00] transition-all duration-200 flex-shrink-0" />
+                    <span className="w-0 group-hover:w-3 h-px bg-[#c8ff00] transition-all duration-200 shrink-0" />
                     {l.label}
                   </Link>
                 </li>

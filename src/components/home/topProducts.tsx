@@ -1,16 +1,14 @@
 "use client"
 
+import { motion } from "motion/react"
 import Image from "next/image"
 import Link from "next/link"
-import { AddFavoriteItem } from "@/src/actions/favorites/add-favorite"
-import { AddToCart } from "@/src/actions/cart/add-to-cart"
-import { ShoppingCart, ImageOff, Check, Plus, Minus, SlidersHorizontal, Search, X, Heart } from "lucide-react"
+import { ShoppingCart, ImageOff, Check, Plus, Minus,  Heart } from "lucide-react"
 import { GetProducts, Products } from "@/src/actions/products/get-all-products"
-import { useState, useEffect, useCallback, useRef } from "react"
-import { useAuth } from "@/src/context/AuthContext"
+import { useState, useEffect, useCallback } from "react"
 import { formatMoney } from "@/src/utils/formatMoney"
-// ─── TIPOS ───────────────────────────────────────────────────────────────────
-type SortKey = "default" | "price-asc" | "price-desc" | "name"
+import { slugify } from "@/src/utils/slugify"
+import { useProductAction } from "@/src/hooks/useProductAction"
 
 // ─── HOOK: carrito por producto ───────────────────────────────────────────────
 function useProductCart() {
@@ -19,10 +17,14 @@ function useProductCart() {
   const [cartItems, setCartItems] = useState<Record<number, boolean>>({})
   const getQty = useCallback((id: number) => quantities[id] ?? 1, [quantities])
 
-  const increase = (id: number) =>
-    setQuantities((prev) => ({ ...prev, [id]: (prev[id] ?? 1) + 1 }))
+  const increase = useCallback((id: number, maxStock: number) =>
+    setQuantities((prev) => ({
+      ...prev,
+      [id]: Math.min((prev[id] ?? 1) + 1, maxStock),
+    })),
+    [])
 
-  const decrease = (id: number) =>
+  const decrease = useCallback((id: number) =>
     setQuantities((prev) => {
       const next = (prev[id] ?? 1) - 1
       if (next <= 0) {
@@ -31,16 +33,17 @@ function useProductCart() {
         return { ...prev, [id]: 1 }
       }
       return { ...prev, [id]: next }
-    })
+    }),
+    [])
 
-  const confirm = (id: number) => {
+  const confirm = useCallback((id: number) => {
     setCartItems((c) => ({ ...c, [id]: true }))
     setActiveCart(null)
-  }
+  }, [])
 
-  const openCart = (id: number) => {
+  const openCart = useCallback((id: number) => {
     setActiveCart(id)
-  }
+  }, [])
 
   return { activeCart, openCart, confirm, getQty, increase, decrease, cartItems }
 }
@@ -65,7 +68,7 @@ function ProductCard({
   activeCart: number | null
   onOpenCart: (id: number) => void
   onConfirm: (id: number) => void
-  onIncrease: (id: number) => void
+  onIncrease: (id: number, maxStock: number) => void
   onDecrease: (id: number) => void
   onFavorite: (id: number) => void
   qty: number
@@ -74,13 +77,12 @@ function ProductCard({
   const isActive = activeCart === product.id
   const [liked, setLiked] = useState(false)
   return (
-    <article
+    <motion.article
+      initial={{ opacity: 0, y: 32 }}
+      animate={loaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 }}
+      transition={{ duration: 0.55, delay: index * 0.055, ease: [0.16, 1, 0.3, 1] }}
       className="apex-card group relative flex flex-col bg-zinc-950 border border-zinc-800/60 overflow-hidden"
       style={{
-        opacity: loaded ? 1 : 0,
-        transform: loaded ? "translateY(0)" : "translateY(32px)",
-        transition: `opacity 0.55s ease, transform 0.55s ease`,
-        transitionDelay: `${index * 55}ms`,
         clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
       }}
     >
@@ -102,7 +104,7 @@ function ProductCard({
       {/* Imagen */}
       <div className="relative aspect-4/3 overflow-hidden bg-zinc-900">
         {product.imagen ? (
-          <Link href={`/products/${product.id}`}>
+          <Link href={`/products/${slugify(product.nombre)}`}>
             <Image
               src={product.imagen}
               alt={product.nombre}
@@ -158,7 +160,7 @@ function ProductCard({
             className="text-white leading-tight line-clamp-2  transition-colors duration-300"
             style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.15rem", letterSpacing: "0.04em" }}
           >
-            <Link href={`/products/${product.id}`}>
+            <Link href={`/products/${slugify(product.nombre)}`}>
               {product.nombre}
             </Link>
           </h3>
@@ -232,7 +234,7 @@ function ProductCard({
               <span className="w-px h-5 bg-zinc-700" />
 
               <button
-                onClick={() => onIncrease(product.id)}
+                onClick={() => onIncrease(product.id, product.stock)}
                 aria-label="Aumentar"
                 className="flex items-center justify-center w-6 h-6 text-zinc-400 hover:text-[#c8ff00] transition-colors"
               >
@@ -257,7 +259,87 @@ function ProductCard({
           </div>
         </div>
       </div>
-    </article>
+    </motion.article>
+  )
+}
+
+// ─── CONTADOR SEMANAL ────────────────────────────────────────────────────────
+function WeeklyCountdown() {
+  const [timeLeft, setTimeLeft] = useState({ dias: 0, horas: 0, minutos: 0, segundos: 0 })
+
+  useEffect(() => {
+    const calcular = () => {
+      const ahora = new Date()
+      // Próximo lunes 00:00:00
+      const proximoLunes = new Date(ahora)
+      const dia = ahora.getDay() // 0 domingo, 1 lunes...
+      const diasHastaLunes = dia === 0 ? 1 : 8 - dia
+      proximoLunes.setDate(ahora.getDate() + diasHastaLunes)
+      proximoLunes.setHours(0, 0, 0, 0)
+
+      const diff = proximoLunes.getTime() - ahora.getTime()
+      setTimeLeft({
+        dias: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        horas: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutos: Math.floor((diff / (1000 * 60)) % 60),
+        segundos: Math.floor((diff / 1000) % 60),
+      })
+    }
+
+    calcular()
+    const interval = setInterval(calcular, 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const pad = (n: number) => String(n).padStart(2, "0")
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+      className="flex flex-col items-center gap-2"
+    >
+      <span
+        style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#ef4444" }}
+      >
+        ⚡ Ofertas terminan en
+      </span>
+
+      <div className="flex items-center gap-2">
+        {[
+          { val: timeLeft.dias, label: "días" },
+          { val: timeLeft.horas, label: "hrs" },
+          { val: timeLeft.minutos, label: "min" },
+          { val: timeLeft.segundos, label: "seg" },
+        ].map(({ val, label }, i) => (
+          <div key={label} className="flex items-center gap-2">
+            <div className="flex flex-col items-center">
+              <span
+                className="border border-red-500/40 bg-red-500/08 px-4 py-1.5 tabular-nums"
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: "clamp(2.5rem, 5vw, 4rem)",
+                  lineHeight: 1,
+                  color: "#ef4444",
+                  boxShadow: "0 0 12px -4px rgba(239,68,68,0.4)",
+                  clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))",
+                }}
+              >
+                {pad(val)}
+              </span>
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "7px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#7f1d1d", marginTop: "4px" }}>
+                {label}
+              </span>
+            </div>
+            {i < 3 && (
+              <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(1.5rem, 3vw, 2.5rem)", color: "#ef4444", opacity: 0.5, marginBottom: "16px" }}>:</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </motion.div>
   )
 }
 
@@ -265,41 +347,11 @@ function ProductCard({
 export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
   const [products, setProducts] = useState<Products[]>([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState("")
-  const [sort, setSort] = useState<SortKey>("default")
-  const [showFilters, setShowFilters] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [visibleCount, setVisibleCount] = useState(8)
-  const searchRef = useRef<HTMLInputElement>(null)
-  const { getIdToken } = useAuth();
   const cart = useProductCart()
-
-  const handleFavoriteItem = useCallback(async (idProducto: number) => {
-    const idToken = await getIdToken();
-    if (!idToken) return;
-    try {
-      await AddFavoriteItem(idToken, { idProducto });
-    } catch (error) {
-      console.error("Error al agregar a favoritos:", error);
-    }
-  }, [getIdToken]);
-
-
-
-  const handleAddToCart = useCallback(async (idProducto: number, cantidad: number) => {
-    const idToken = await getIdToken();
-    if (!idToken) return;
-    try {
-      await AddToCart(idToken, { idProducto, cantidad });
-    } catch (error) {
-      console.error("Error al agregar al carrito:", error);
-    }
-  }, [getIdToken]);
-
-  const confirmAndAdd = useCallback((id: number) => {
-    cart.confirm(id);
-    handleAddToCart(id, cart.getQty(id));
-  }, [cart, handleAddToCart]);
+  const { handleFavoriteItem, confirmAndAdd } = useProductAction({
+    onConfirmCart: cart.confirm,
+    getQuantity: cart.getQty,
+  })
 
 
   useEffect(() => {
@@ -315,31 +367,12 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
     load()
   }, [onLoaded])
 
-  // Categorías únicas
-  const categories = ["all", ...Array.from(new Set(products.map((p) => p.categoria).filter(Boolean)))]
 
-  // Filtros + sort
-  const filtered = products
-    .filter((p) => {
-      const q = search.toLowerCase()
-      const matchSearch =
-        !q ||
-        p.nombre.toLowerCase().includes(q) ||
-        p.marca?.toLowerCase().includes(q) ||
-        p.categoria?.toLowerCase().includes(q)
-      const matchCat = selectedCategory === "all" || p.categoria === selectedCategory
-      return matchSearch && matchCat
-    })
-    .sort((a, b) => {
-      if (sort === "price-asc") return a.precio - b.precio
-      if (sort === "price-desc") return b.precio - a.precio
-      if (sort === "name") return a.nombre.localeCompare(b.nombre)
-      return 0
-    })
 
-  const visible = filtered.slice(0, visibleCount)
-  const hasMore = visibleCount < filtered.length
+
+
   const totalInCart = Object.values(cart.cartItems).filter(Boolean).length
+
   return (
     <section className="w-full bg-black py-16 relative overflow-hidden">
 
@@ -361,7 +394,12 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
         {/* ── HEADER ── */}
         <div className="flex flex-col gap-6 mb-10">
           <div className="flex items-end justify-between">
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
               {/* Eyebrow */}
               <div
                 className="flex items-center gap-3 mb-2 text-[#c8ff00]"
@@ -385,10 +423,10 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
                   DESTACADOS
                 </span>
               </h2>
-            </div>
-
+            </motion.div>
             {/* Cart badge + filtros toggle */}
             <div className="flex items-center gap-3">
+              
               {totalInCart > 0 && (
                 <div
                   className="flex items-center gap-2 border border-[#c8ff00]/30 bg-[#c8ff00]/5 px-3 py-1.5"
@@ -410,103 +448,20 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
                 </div>
               )}
 
-              <button
-                onClick={() => setShowFilters((v) => !v)}
-                className={`flex items-center gap-2 border px-3 py-2 transition-colors duration-200
-                  ${showFilters ? "border-[#c8ff00] text-[#c8ff00] bg-[#c8ff00]/5" : "border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200"}`}
-                style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" }}
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                Filtros
-              </button>
+
             </div>
           </div>
 
-          {/* ── PANEL DE FILTROS ── */}
-          <div
-            className="overflow-hidden transition-all duration-500 ease-out"
-            style={{ maxHeight: showFilters ? "200px" : "0px", opacity: showFilters ? 1 : 0 }}
-          >
-            <div className="border border-zinc-800/80 bg-zinc-950/80 p-4 flex flex-col gap-4">
-
-              {/* Búsqueda */}
-              <div className="relative flex items-center">
-                <Search className="absolute left-3 w-3.5 h-3.5 text-zinc-600 pointer-events-none" />
-                <input
-                  ref={searchRef}
-                  type="text"
-                  value={search}
-                  onChange={(e) => { setSearch(e.target.value); setVisibleCount(8) }}
-                  placeholder="Buscar por nombre, marca o categoría..."
-                  className="w-full bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600
-                             pl-9 pr-9 py-2.5 outline-none focus:border-[#c8ff00]/40 transition-colors"
-                  style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.05em" }}
-                />
-                {search && (
-                  <button
-                    onClick={() => { setSearch(""); searchRef.current?.focus() }}
-                    className="absolute right-3 text-zinc-600 hover:text-zinc-300 transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-
-              {/* Categorías + Sort */}
-              <div className="flex flex-wrap gap-3 items-center justify-between">
-                {/* Chips de categoría */}
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => { setSelectedCategory(cat); setVisibleCount(8) }}
-                      className={`px-3 py-1 text-[9px] tracking-widest uppercase transition-all duration-200
-                        ${selectedCategory === cat
-                          ? "bg-[#c8ff00] text-black"
-                          : "border border-zinc-700 text-zinc-500 hover:border-zinc-500 hover:text-zinc-300"
-                        }`}
-                      style={{
-                        fontFamily: "'Space Mono', monospace",
-                        clipPath: selectedCategory === cat
-                          ? "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px))"
-                          : "none",
-                      }}
-                    >
-                      {cat === "all" ? "Todos" : cat}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Ordenar */}
-                <select
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value as SortKey)}
-                  className="bg-zinc-900 border border-zinc-700 text-zinc-300 px-3 py-1.5 outline-none
-                             focus:border-zinc-500 transition-colors cursor-pointer"
-                  style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em" }}
-                >
-                  <option value="default">Relevancia</option>
-                  <option value="price-asc">Precio: menor a mayor</option>
-                  <option value="price-desc">Precio: mayor a menor</option>
-                  <option value="name">Nombre A-Z</option>
-                </select>
-              </div>
-            </div>
+          {/* ── COUNTDOWN SEMANAL (centrado en la página) ── */}
+          <div className="flex justify-center">
+            <WeeklyCountdown />
           </div>
 
           {/* Contador de resultados */}
-          <div
-            className="text-zinc-600"
-            style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.15em", textTransform: "uppercase" }}
-          >
-            {!loading && filtered.length === 0
-              ? "Sin resultados"
-              : `Mostrando ${Math.min(visibleCount, filtered.length)} de ${filtered.length} productos`}
-          </div>
         </div>
 
         {/* ── GRID DE PRODUCTOS ── */}
-        {!loading && filtered.length === 0 ? (
+        {!loading && products.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4 border border-zinc-800/50">
             <span
               style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "4rem", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.2)" }}
@@ -517,19 +472,12 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
               className="text-zinc-600"
               style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.15em" }}
             >
-              No hay productos que coincidan con tu búsqueda.
+              No hay productos disponibles.
             </p>
-            <button
-              onClick={() => { setSearch(""); setSelectedCategory("all") }}
-              className="mt-2 border border-zinc-700 text-zinc-400 px-4 py-2 hover:border-[#c8ff00]/40 hover:text-[#c8ff00] transition-all"
-              style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" }}
-            >
-              Limpiar filtros
-            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-800/30">
-            {visible.map((product, i) => (
+            {products.slice(0, 8).map((product, i) => (
 
               <ProductCard
                 key={product.id}
@@ -550,31 +498,12 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
 
         )}
 
-        {/* ── FOOTER: Ver más + Link ── */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-10 pt-8 border-t border-zinc-800/50">
-          {hasMore && (
-            <button
-              onClick={() => setVisibleCount((v) => v + 8)}
-              className="group flex items-center gap-2 bg-[#c8ff00] text-black px-6 py-3
-                         hover:bg-yellow-300 transition-colors duration-200 active:scale-95"
-              style={{
-                fontFamily: "'Space Mono', monospace",
-                fontSize: "11px",
-                fontWeight: 700,
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
-              }}
-            >
-              Cargar más
-              <span className="transition-transform duration-300 group-hover:translate-y-0.5 inline-block">↓</span>
-            </button>
-          )}
-
+        {/* ── FOOTER: Link ── */}
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-10 pt-8 border-t border-zinc-800/50">
           <Link
-            href="/productos"
+            href="/allProducts"
             className="group inline-flex items-center gap-2 border border-zinc-700 text-zinc-400 px-6 py-3
-                       hover:border-[#c8ff00]/50 hover:text-[#c8ff00] transition-all duration-300 ml-auto"
+                       hover:border-[#c8ff00]/50 hover:text-[#c8ff00] transition-all duration-300"
             style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase" }}
           >
             Ver catálogo completo
