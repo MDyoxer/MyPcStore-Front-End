@@ -8,8 +8,9 @@ import { useAuth } from "@/src/context/AuthContext";
 import { formatDateTime } from "@/src/utils/formatDateTime";
 import { formatMoney } from "@/src/utils/formatMoney";
 import { getStatus } from "@/src/utils/orderStatus";
-import { ShoppingBag, ChevronRight, Search, X, ArrowUpDown } from "lucide-react";
+import { ShoppingBag, ChevronRight, Search, X, ArrowUpDown, ImageOff } from "lucide-react";
 import Loading from "../ui/loading";
+import Image from "next/image";
 
 type SortKey = "date-desc" | "date-asc" | "total-desc" | "total-asc";
 
@@ -46,66 +47,100 @@ function OrderRow({ order, index }: { order: orderItems; index: number }) {
       <div className="absolute left-0 top-0 bottom-0 w-0.75 transition-all duration-300"
         style={{ background: cfg.color, opacity: 0.5, boxShadow: `0 0 8px ${cfg.color}` }} />
 
-      <div className="relative ml-0.75 flex flex-col sm:flex-row sm:items-center gap-4 bg-zinc-950 border border-zinc-800/60
-                      px-5 py-4 group-hover:border-zinc-700/60 transition-colors duration-300"
+      <div className="relative ml-0.75 flex flex-col sm:flex-row sm:items-center gap-x-6 gap-y-3 bg-zinc-950 border border-zinc-800/60
+                      px-8 sm:px-12 py-10 group-hover:border-zinc-700/60 transition-colors duration-300"
         style={{ clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))" }}>
 
         {/* Acento esquina */}
         <span aria-hidden className="absolute top-0 right-0 w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{ background: cfg.color, clipPath: "polygon(0 0, 100% 100%, 100% 0)" }} />
 
-        {/* Número de orden */}
-        <div className="shrink-0 flex flex-col gap-0.5">
-          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#c8ff00" }}>
-            Orden
-          </span>
-          <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.5rem", letterSpacing: "0.05em", color: cfg.color, lineHeight: 1 }}>
-            #{String(order.idOrden).padStart(4, "0")}
-          </span>
+        {/* Fila (móvil): número + status */}
+        <div className="flex items-center justify-between gap-3 sm:contents">
+          {/* Número de orden */}
+          <div className="shrink-0 flex flex-col gap-0.5">
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#c8ff00" }}>
+              Orden
+            </span>
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.8rem", letterSpacing: "0.05em", color: cfg.color, lineHeight: 1 }}>
+              #{String(order.idOrden).padStart(4, "0")}
+            </span>
+          </div>
+          {/* Status (solo móvil) */}
+          <div className="sm:hidden shrink-0">
+            <StatusBadge pagado={order.pagado} />
+          </div>
         </div>
 
         <div className="w-px h-10 bg-zinc-800/60 hidden sm:block shrink-0" />
 
-        {/* Fecha */}
-        <div className="flex flex-col gap-0.5 shrink-0">
-          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#c8ff00" }}>
-            Fecha pedido
-          </span>
-          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#71717a" }}>
-            {formatDateTime(order.fechaOrden)}
-          </span>
+        {/* Fila (móvil): fecha + miniaturas */}
+        <div className="flex items-center justify-between gap-3 sm:contents">
+          {/* Fecha */}
+          <div className="flex flex-col gap-0.5 shrink-0">
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#c8ff00" }}>
+              Fecha pedido
+            </span>
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", color: "#71717a" }}>
+              {formatDateTime(order.fechaOrden)}
+            </span>
+          </div>
+
+          {/* Status (solo desktop) */}
+          <div className="hidden sm:block shrink-0">
+            <StatusBadge pagado={order.pagado} />
+          </div>
+
+          {/* Miniaturas de productos */}
+          <div className="shrink-0">
+            <div className="flex -space-x-1.5">
+              {order.imgProductos?.slice(0, 4).map((img, i) => (
+                <div key={`${img}-${i}`}
+                  className="relative w-8 h-8 sm:w-14 sm:h-14 bg-zinc-900 border border-zinc-800 overflow-hidden"
+                  style={{ clipPath: "polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px))" }}>
+                  {img ? (
+                    <Image src={img} alt="" fill sizes="56px" className="object-contain p-0.5 sm:p-1.5" />
+                  ) : (
+                    <ImageOff className="w-3 h-3 text-zinc-700" />
+                  )}
+                </div>
+              ))}
+              {order.imgProductos && order.imgProductos.length > 4 && (
+                <div className="flex items-center justify-center w-8 h-8 sm:w-14 sm:h-14 border border-zinc-700 bg-zinc-900"
+                  style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", color: "#c8ff00" }}>
+                  +{order.imgProductos.length - 4}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="w-px h-10 bg-zinc-800/60 hidden sm:block shrink-0" />
+        {/* Fila (móvil): total + botón */}
+        <div className="flex items-center justify-between gap-3 sm:contents">
+          {/* Total */}
+          <div className="flex flex-col gap-0.5 sm:ml-auto">
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
+              Total
+            </span>
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.6rem", letterSpacing: "0.02em", color: "#a855f7", lineHeight: 1 }}>
+              {formatMoney(order.total)}
+            </span>
+          </div>
 
-        {/* Status */}
-        <div className="shrink-0">
-          <StatusBadge pagado={order.pagado} />
+          {/* Botón detalles */}
+          <motion.div whileHover={{ x: 3 }} whileTap={{ scale: 0.96 }} className="shrink-0">
+            <Link href={`/orders/${order.idOrden}`}
+              className="flex items-center gap-2 border border-zinc-700 text-zinc-500 px-5 py-2.5
+                         hover:border-[#c8ff00]/50 hover:text-[#c8ff00] transition-all duration-200"
+              style={{
+                fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase",
+                clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))",
+              }}>
+              Detalles
+              <ChevronRight className="w-3 h-3" />
+            </Link>
+          </motion.div>
         </div>
-
-        {/* Total */}
-        <div className="flex flex-col gap-0.5 sm:ml-auto">
-          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "8px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
-            Total
-          </span>
-          <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.4rem", letterSpacing: "0.02em", color: "#a855f7", lineHeight: 1 }}>
-            {formatMoney(order.total)}
-          </span>
-        </div>
-
-        {/* Botón detalles */}
-        <motion.div whileHover={{ x: 3 }} whileTap={{ scale: 0.96 }} className="shrink-0">
-          <Link href={`/orders/${order.idOrden}`}
-            className="flex items-center gap-2 border border-zinc-700 text-zinc-500 px-4 py-2
-                       hover:border-[#c8ff00]/50 hover:text-[#c8ff00] transition-all duration-200"
-            style={{
-              fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase",
-              clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))",
-            }}>
-            Detalles
-            <ChevronRight className="w-3 h-3" />
-          </Link>
-        </motion.div>
       </div>
     </motion.li>
   );
@@ -150,7 +185,6 @@ export default function ClientOrders() {
       return 0;
     });
 
-  const totalGastado = orders.reduce((acc, o) => acc + o.total, 0);
 
   if (loading) return <Loading />;
 
@@ -165,7 +199,7 @@ export default function ClientOrders() {
           maskImage: "radial-gradient(ellipse at 50% 0%, black 20%, transparent 70%)",
         }} />
 
-      <div className="max-w-4xl mx-auto px-4 pt-12 pb-24 relative">
+      <div className="max-w-6xl mx-auto px-4 pt-12 pb-24 relative">
 
         {/* ── HEADER ── */}
         <motion.div

@@ -30,9 +30,9 @@ export default function Navbar() {
     }
   };
   return (
-    <nav className="bg-black border-b border-zinc-800 sticky top-0 shadow-md z-50">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4 justify-between relative">
-        <Link href="/" className="flex items-center gap-2 group">
+    <nav className="bg-black border-b border-zinc-800 sticky top-0 shadow-md z-50 overflow-x-clip">
+      <div className="max-w-7xl mx-auto px-4 h-16 flex w-full min-w-0 items-center justify-between gap-2 sm:gap-4 relative">
+        <Link href="/" className="flex min-w-0 shrink items-center gap-2 group">
           <div
             className="flex items-center justify-center w-9 h-9 bg-[#c8ff00]"
             style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}
@@ -40,7 +40,7 @@ export default function Navbar() {
             <Cpu className="w-5 h-5 text-black" />
           </div>
           <span
-            className="text-white group-hover:text-[#c8ff00] transition-colors duration-200"
+            className="min-w-0 whitespace-nowrap text-[1.45rem] sm:text-[1.8rem] text-white group-hover:text-[#c8ff00] transition-colors duration-200"
             style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.8rem", letterSpacing: "0.1em" }}
           >
             MyPC<span className="text-[#c8ff00]">Store</span>
@@ -58,7 +58,7 @@ export default function Navbar() {
           />
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-4">
           {/* Theme */}
           <button className="hidden sm:flex p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all duration-200 active:scale-90">
             <Sun className="w-5 h-5" />
@@ -141,7 +141,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all duration-200 rounded-none border-0 outline-none"
+            className="lg:hidden shrink-0 p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all duration-200 rounded-none border-0 outline-none"
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -163,13 +163,13 @@ export default function Navbar() {
       </div>
 
       {isMenuOpen && (
-        <div className="lg:hidden border-t border-zinc-800 bg-black">
+        <div className="lg:hidden w-full overflow-x-clip border-t border-zinc-800 bg-black">
           <div className="px-4 py-4 space-y-1">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="block text-zinc-400 hover:text-white hover:bg-zinc-900 text-sm py-2.5 px-3 rounded-lg transition-all duration-200"
+                className="block w-full text-zinc-400 hover:text-white hover:bg-zinc-900 text-sm py-2.5 px-3 rounded-lg transition-all duration-200"
               >
                 {link.label}
               </a>

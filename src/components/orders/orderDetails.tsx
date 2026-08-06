@@ -55,14 +55,14 @@ function ItemRow({ item, index }: { item: orderDetailsItems; index: number }) {
           style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.05rem", letterSpacing: "0.04em" }}>
           {item.producto}
         </p>
-        <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.1em", color: "#52525b" }}>
+        <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.1em", color: "#52525b" }}>
           {formatMoney(item.precioGuardado)} c/u
         </p>
       </div>
 
       {/* Cantidad */}
       <div className="shrink-0 flex flex-col items-center gap-0.5">
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "8px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
           Cant.
         </span>
         <span className="border border-[#c8ff00]/25 bg-[#c8ff00]/05 px-2 py-0.5"
@@ -101,11 +101,11 @@ function ShipmentTimeline({ status, detalle }: { status: string; detalle: string
             <Icon className="w-3 h-3" style={{ color: cfg.color }} />
           </span>
           <div className="flex flex-col gap-0.5">
-            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase", color: cfg.color }}>
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: cfg.color }}>
               {cfg.label}
             </span>
             {detalle && (
-              <p className="text-zinc-500 leading-relaxed" style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px" }}>
+              <p className="text-zinc-500 leading-relaxed" style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px" }}>
                 {detalle}
               </p>
             )}
@@ -141,11 +141,11 @@ function ShipmentTimeline({ status, detalle }: { status: string; detalle: string
             </div>
 
             <div className="flex flex-col gap-0.5 pb-4 min-w-0">
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase", color: labelColor }}>
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: labelColor }}>
                 {stepCfg.label}
               </span>
               {state === "active" && detalle && (
-                <p className="text-zinc-500 leading-relaxed" style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px" }}>
+                <p className="text-zinc-500 leading-relaxed" style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px" }}>
                   {detalle}
                 </p>
               )}
@@ -177,7 +177,7 @@ function ShippingStatusCard({ envio }: { envio: orderDetailsItems }) {
 
       {/* Eyebrow */}
       <div className="flex items-center gap-3"
-        style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.35em", textTransform: "uppercase", color: "#c8ff00" }}>
+        style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.35em", textTransform: "uppercase", color: "#c8ff00" }}>
         <span className="w-8 h-px bg-[#c8ff00]" />
         Estado del envío
       </div>
@@ -185,7 +185,7 @@ function ShippingStatusCard({ envio }: { envio: orderDetailsItems }) {
       {/* Badge status */}
       <span className="inline-flex items-center gap-2 self-start px-3.5 py-1.5"
         style={{
-          fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase",
+          fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.2em", textTransform: "uppercase",
           color: cfg.color, background: cfg.bg, border: `1px solid ${cfg.border}`,
           clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))",
         }}>
@@ -197,7 +197,7 @@ function ShippingStatusCard({ envio }: { envio: orderDetailsItems }) {
 
       {/* Detalles envío */}
       <div className="flex flex-col gap-3">
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#3f3f46" }}>
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "12px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#3f3f46" }}>
           Detalles del envío
         </span>
         <ShipmentTimeline status={envio.statusEnvio} detalle={envio.detallesEnvio} />
@@ -205,7 +205,7 @@ function ShippingStatusCard({ envio }: { envio: orderDetailsItems }) {
 
       {/* Entrega estimada */}
       <div className="flex items-center justify-between gap-3">
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
           Entrega estimada
         </span>
         <span className="text-right" style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#a855f7" }}>
