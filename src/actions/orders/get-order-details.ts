@@ -5,11 +5,14 @@ export type orderDetailsItems = {
     cantidad: number,
     precioGuardado: number,
     idProducto: number,
-    producto:string,
-    imgProducto:string,
+    producto: string,
+    imgProducto: string,
+    statusEnvio: string,
+    detallesEnvio: string,
+    fechaEntregaEstimada: string,
 }
 
-export async function GetOrderUserItems(idToken: string, idOrden:number): Promise<orderDetailsItems[]> {
+export async function GetOrderUserItems(idToken: string, idOrden: number): Promise<orderDetailsItems[]> {
     const reponse = await fetch(buildApiUrl(`/orders/${idOrden}`), {
         method: "GET",
         cache: "no-store",

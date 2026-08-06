@@ -133,7 +133,7 @@ function ProductCard({
 
         {/* Precio + carrito */}
         <div className="flex items-center justify-between mt-auto pt-2 border-t border-zinc-800/50">
-          <span className="text-[#c8ff00]"
+          <span className="text-[#9e00c6]"
             style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.4rem", letterSpacing: "0.02em" }}>
             {formatMoney(product.precio)}
           </span>
@@ -428,12 +428,11 @@ export default function AllProducts() {
            shrink-0 w-64 bg-zinc-950 border border-zinc-800/60 flex flex-col
              lg:top-6
             fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
-            transition-transform duration-300 ease-out overflow-y-auto
+            transition-transform duration-300 ease-out overflow-y-auto mpc-scrollbar
             lg:translate-x-0 lg:max-h-[calc(100vh-3rem)]
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           `}
             style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
-
             {/* Acento */}
             <span aria-hidden className="absolute top-0 right-0 w-3 h-3 bg-purple-500"
               style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }} />

@@ -98,7 +98,7 @@ export default function Navbar() {
                       <li className="border border-transparent rounded-lg mt-2 transition-all p-2
                    duration-200 hover:border-[#c8ff00] ">
                         <Link
-                          href="/"
+                          href="/orders"
                           onClick={() => setIsUserMenuOpen(false)}
                           className="flex items-center  px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 hover:rounded-sm transition-all duration-200"
                           style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}

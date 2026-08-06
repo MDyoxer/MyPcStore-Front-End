@@ -1,5 +1,7 @@
 "use client";
 
+import { motion } from "motion/react";
+
 const REVIEWS = [
   {
     name: "Carlos Mendoza",
@@ -72,14 +74,22 @@ export default function Reviews() {
 
       {/* ── HEADER ── */}
       <div className="max-w-7xl mx-auto px-4 mb-14 relative">
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="flex items-center gap-3 mb-3 text-[#c8ff00]"
           style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.35em", textTransform: "uppercase" }}
         >
           <span className="w-8 h-px bg-[#c8ff00]" />
           Testimonios
-        </div>
-        <h2
+        </motion.div>
+        <motion.h2
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           className="leading-none"
           style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2.5rem, 6vw, 5rem)", letterSpacing: "0.03em" }}
         >
@@ -87,7 +97,7 @@ export default function Reviews() {
           <span style={{ color: "transparent", WebkitTextStroke: "1.5px #c8ff00" }}>NUESTROS</span>
           <br />
           <span className="text-white">CLIENTES</span>
-        </h2>
+        </motion.h2>
       </div>
 
       {/* ── CARRUSEL ── */}
@@ -113,8 +123,13 @@ export default function Reviews() {
           onMouseLeave={(e) => (e.currentTarget.style.animationPlayState = "running")}
         >
           {TRACK.map((r, i) => (
-            <article
+            <motion.article
               key={i}
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55, delay: (i % REVIEWS.length) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -4 }}
               className="shrink-0 w-85 flex flex-col gap-5 bg-zinc-950 border border-zinc-800/60 p-7 relative overflow-hidden group
                          hover:border-zinc-700/60 transition-colors duration-300"
               style={{
@@ -150,7 +165,7 @@ export default function Reviews() {
                 className="text-zinc-400 leading-relaxed flex-1"
                 style={{ fontFamily: "'Space Mono', monospace", fontSize: "13px", lineHeight: "1.9", letterSpacing: "0.02em" }}
               >
-                "{r.text}"
+                &quot;{r.text}&quot;
               </p>
 
               {/* Separador */}
@@ -204,7 +219,7 @@ export default function Reviews() {
           
                 </span>
               </div>
-            </article>
+            </motion.article>
           ))}
         </div>
       </div>

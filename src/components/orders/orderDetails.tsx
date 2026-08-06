@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { GetOrderUserItems, orderDetailsItems } from "@/src/actions/orders/get-order-details";
 import { useAuth } from "@/src/context/AuthContext";
 import { formatMoney } from "@/src/utils/formatMoney";
+import { formatDateTime } from "@/src/utils/formatDateTime";
+import { getStatus, STATUS_CONFIG, type StatusKey } from "@/src/utils/orderStatus";
 import { ArrowLeft, CheckCircle2, ImageOff, Package } from "lucide-react";
 import Loading from "../ui/loading";
 import { slugify } from "@/src/utils/slugify";
@@ -82,6 +84,138 @@ function ItemRow({ item, index }: { item: orderDetailsItems; index: number }) {
   );
 }
 
+// ─── LÍNEA DE TIEMPO ──────────────────────────────────────────────────────────
+const TIMELINE_STEPS: StatusKey[] = ["pendiente", "procesando", "enviado", "entregado"];
+
+function ShipmentTimeline({ status, detalle }: { status: string; detalle: string }) {
+  const currentIdx = TIMELINE_STEPS.indexOf(status as StatusKey);
+
+  if (currentIdx === -1) {
+    const cfg = getStatus(status);
+    const Icon = cfg.icon;
+    return (
+      <ol className="flex flex-col">
+        <li className="relative flex gap-3">
+          <span className="flex items-center justify-center w-6 h-6 rounded-full border shrink-0"
+            style={{ borderColor: cfg.border, background: cfg.bg, boxShadow: `0 0 12px -2px ${cfg.color}` }}>
+            <Icon className="w-3 h-3" style={{ color: cfg.color }} />
+          </span>
+          <div className="flex flex-col gap-0.5">
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase", color: cfg.color }}>
+              {cfg.label}
+            </span>
+            {detalle && (
+              <p className="text-zinc-500 leading-relaxed" style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px" }}>
+                {detalle}
+              </p>
+            )}
+          </div>
+        </li>
+      </ol>
+    );
+  }
+
+  return (
+    <ol className="flex flex-col">
+      {TIMELINE_STEPS.map((key, idx) => {
+        const stepCfg = STATUS_CONFIG[key];
+        const StepIcon = stepCfg.icon;
+        const state = idx < currentIdx ? "done" : idx === currentIdx ? "active" : "pending";
+        const isLast = idx === TIMELINE_STEPS.length - 1;
+        const lineColor = idx < currentIdx ? STATUS_CONFIG[TIMELINE_STEPS[idx + 1]].color : "rgba(63,63,70,0.4)";
+        const dotColor = state === "pending" ? "#3f3f46" : stepCfg.color;
+        const labelColor = state === "pending" ? "#52525b" : stepCfg.color;
+
+        return (
+          <li key={key} className="relative flex gap-3">
+            <div className="flex flex-col items-center shrink-0">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full border shrink-0"
+                style={{
+                  borderColor: state === "pending" ? "rgba(63,63,70,0.6)" : stepCfg.border,
+                  background: state === "pending" ? "#18181b" : stepCfg.bg,
+                  boxShadow: state === "active" ? `0 0 12px -2px ${stepCfg.color}` : undefined,
+                }}>
+                <StepIcon className="w-3 h-3" style={{ color: dotColor }} />
+              </span>
+              {!isLast && <span className="w-px flex-1 min-h-4 my-1" style={{ background: lineColor }} />}
+            </div>
+
+            <div className="flex flex-col gap-0.5 pb-4 min-w-0">
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase", color: labelColor }}>
+                {stepCfg.label}
+              </span>
+              {state === "active" && detalle && (
+                <p className="text-zinc-500 leading-relaxed" style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px" }}>
+                  {detalle}
+                </p>
+              )}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+// ─── ENVÍO ────────────────────────────────────────────────────────────────────
+function ShippingStatusCard({ envio }: { envio: orderDetailsItems }) {
+  const cfg = getStatus(envio.statusEnvio);
+  const Icon = cfg.icon;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -24 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="bg-zinc-950 border border-zinc-800/60 p-6 flex flex-col gap-5 relative"
+      style={{ clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))" }}
+    >
+      <span aria-hidden className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#c8ff00]"
+        style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }} />
+      <span aria-hidden className="absolute bottom-0 left-0 w-3.5 h-3.5 bg-purple-500"
+        style={{ clipPath: "polygon(0 0, 0 100%, 100% 100%)" }} />
+
+      {/* Eyebrow */}
+      <div className="flex items-center gap-3"
+        style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.35em", textTransform: "uppercase", color: "#c8ff00" }}>
+        <span className="w-8 h-px bg-[#c8ff00]" />
+        Estado del envío
+      </div>
+
+      {/* Badge status */}
+      <span className="inline-flex items-center gap-2 self-start px-3.5 py-1.5"
+        style={{
+          fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase",
+          color: cfg.color, background: cfg.bg, border: `1px solid ${cfg.border}`,
+          clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))",
+        }}>
+        <Icon className="w-3 h-3" />
+        {cfg.label}
+      </span>
+
+      <div className="h-px bg-zinc-800" />
+
+      {/* Detalles envío */}
+      <div className="flex flex-col gap-3">
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#3f3f46" }}>
+          Detalles del envío
+        </span>
+        <ShipmentTimeline status={envio.statusEnvio} detalle={envio.detallesEnvio} />
+      </div>
+
+      {/* Entrega estimada */}
+      <div className="flex items-center justify-between gap-3">
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
+          Entrega estimada
+        </span>
+        <span className="text-right" style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#a855f7" }}>
+          {envio.fechaEntregaEstimada ? formatDateTime(envio.fechaEntregaEstimada) : "Por confirmar"}
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 export default function OrderDetails({ orderId }: { orderId: number }) {
   const [items, setItems]     = useState<orderDetailsItems[]>([]);
@@ -122,7 +256,7 @@ export default function OrderDetails({ orderId }: { orderId: number }) {
       <div aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 w-150 h-75 pointer-events-none"
         style={{ background: "radial-gradient(ellipse, rgba(168,85,247,0.07) 0%, transparent 70%)", filter: "blur(40px)" }} />
 
-      <div className="max-w-3xl mx-auto px-4 pt-10 pb-24 relative">
+      <div className="max-w-6xl mx-auto px-4 pt-10 pb-24 relative">
 
         {/* ── BREADCRUMB ── */}
         <motion.div
@@ -134,7 +268,7 @@ export default function OrderDetails({ orderId }: { orderId: number }) {
             className="inline-flex items-center gap-2 text-zinc-600 hover:text-[#c8ff00] transition-colors duration-200 group mb-10"
             style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase" }}>
             <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
-            Mis pedidos
+            Mis ordenes
           </Link>
         </motion.div>
 
@@ -181,108 +315,114 @@ export default function OrderDetails({ orderId }: { orderId: number }) {
           />
         </motion.div>
 
-        {/* ── LISTA DE ITEMS ── */}
-        <AnimatePresence>
-          {items.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center py-20 gap-4 border border-zinc-800/40"
-            >
-              <Package className="w-10 h-10 text-zinc-800" />
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#52525b" }}>
-                No se encontraron productos en esta orden.
-              </span>
-            </motion.div>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {items.map((item, i) => (
-                <ItemRow key={item.idProducto} item={item} index={i} />
-              ))}
-            </ul>
-          )}
-        </AnimatePresence>
-
-        {/* ── RESUMEN TOTAL ── */}
-        {items.length > 0 && (
+        {/* ── CONTENIDO ── */}
+        {items.length === 0 ? (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: items.length * 0.06 + 0.1 }}
-            className="mt-4"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-20 gap-4 border border-zinc-800/40"
           >
-            {/* Fin de lista */}
-            <div className="flex flex-col items-start gap-1 pt-3 pl-1 mb-6">
-              <span className="h-px bg-[#c8ff00] w-16 opacity-80" />
-              <span className="h-px bg-[#c8ff00] w-10 opacity-50" />
-              <span className="h-px bg-[#c8ff00] w-5  opacity-25" />
-            </div>
-
-            {/* Panel resumen */}
-            <div className="bg-zinc-950 border border-zinc-800/60 p-6 flex flex-col gap-4 relative"
-              style={{ clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))" }}>
-
-              <span aria-hidden className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#c8ff00]"
-                style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }} />
-              <span aria-hidden className="absolute bottom-0 left-0 w-3.5 h-3.5 bg-purple-500"
-                style={{ clipPath: "polygon(0 0, 0 100%, 100% 100%)" }} />
-
-              {/* Desglose */}
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#52525b" }}>
-                    Productos
-                  </span>
-                  <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.1rem", color: "#71717a" }}>
-                    {items.length} {items.length === 1 ? "artículo" : "artículos"}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#52525b" }}>
-                    Unidades totales
-                  </span>
-                  <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.1rem", color: "#71717a" }}>
-                    {totalItems}
-                  </span>
-                </div>
-              </div>
-
-              <div className="h-px bg-zinc-800" />
-
-              {/* Total */}
-              <div className="flex items-baseline justify-between">
-                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#52525b" }}>
-                  Total pagado
-                </span>
-                <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2.5rem", letterSpacing: "0.02em", color: "#c8ff00", lineHeight: 1 }}>
-                  {formatMoney(total)}
-                </span>
-              </div>
-            </div>
-
-            {/* Acciones */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-6">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className="flex-1">
-                <Link href="/orders"
-                  className="w-full flex items-center justify-center gap-2 border border-zinc-700 text-zinc-400 py-3
-                             hover:border-[#c8ff00]/40 hover:text-[#c8ff00] transition-all duration-200"
-                  style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase",
-                    clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}>
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  Mis pedidos
-                </Link>
-              </motion.div>
-
-              <motion.div whileHover={{ scale: 1.02, boxShadow: "0 0 30px -8px rgba(200,255,0,0.5)" }} whileTap={{ scale: 0.97 }} className="flex-1">
-                <Link href="/productos"
-                  className="w-full flex items-center justify-center gap-2 bg-[#c8ff00] text-black py-3
-                             hover:bg-yellow-300 transition-colors duration-200"
-                  style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase",
-                    clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}>
-                  Seguir comprando →
-                </Link>
-              </motion.div>
-            </div>
+            <Package className="w-10 h-10 text-zinc-800" />
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#52525b" }}>
+              No se encontraron productos en esta orden.
+            </span>
           </motion.div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 lg:gap-8 items-start">
+
+            {/* Card de envío */}
+            <aside className="lg:sticky lg:top-6">
+              <ShippingStatusCard envio={items[0]} />
+            </aside>
+
+            {/* Items + resumen */}
+            <div className="flex flex-col gap-4">
+              <ul className="flex flex-col gap-2">
+                {items.map((item, i) => (
+                  <ItemRow key={item.idProducto} item={item} index={i} />
+                ))}
+              </ul>
+
+              {/* ── RESUMEN TOTAL ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: items.length * 0.06 + 0.1 }}
+              >
+                {/* Fin de lista */}
+                <div className="flex flex-col items-start gap-1 pt-3 pl-1 mb-6">
+                  <span className="h-px bg-[#c8ff00] w-16 opacity-80" />
+                  <span className="h-px bg-[#c8ff00] w-10 opacity-50" />
+                  <span className="h-px bg-[#c8ff00] w-5  opacity-25" />
+                </div>
+
+                {/* Panel resumen */}
+                <div className="bg-zinc-950 border border-zinc-800/60 p-6 flex flex-col gap-4 relative"
+                  style={{ clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))" }}>
+
+                  <span aria-hidden className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#c8ff00]"
+                    style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }} />
+                  <span aria-hidden className="absolute bottom-0 left-0 w-3.5 h-3.5 bg-purple-500"
+                    style={{ clipPath: "polygon(0 0, 0 100%, 100% 100%)" }} />
+
+                  {/* Desglose */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center">
+                      <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#52525b" }}>
+                        Productos
+                      </span>
+                      <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.1rem", color: "#71717a" }}>
+                        {items.length} {items.length === 1 ? "artículo" : "artículos"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#52525b" }}>
+                        Unidades totales
+                      </span>
+                      <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.1rem", color: "#71717a" }}>
+                        {totalItems}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-zinc-800" />
+
+                  {/* Total */}
+                  <div className="flex items-baseline justify-between">
+                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#52525b" }}>
+                      Total pagado
+                    </span>
+                    <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2.5rem", letterSpacing: "0.02em", color: "#c8ff00", lineHeight: 1 }}>
+                      {formatMoney(total)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Acciones */}
+                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className="flex-1">
+                    <Link href="/orders"
+                      className="w-full flex items-center justify-center gap-2 border border-zinc-700 text-zinc-400 py-3
+                                 hover:border-[#c8ff00]/40 hover:text-[#c8ff00] transition-all duration-200"
+                      style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase",
+                        clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}>
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      Mis pedidos
+                    </Link>
+                  </motion.div>
+
+                  <motion.div whileHover={{ scale: 1.02, boxShadow: "0 0 30px -8px rgba(200,255,0,0.5)" }} whileTap={{ scale: 0.97 }} className="flex-1">
+                    <Link href="/productos"
+                      className="w-full flex items-center justify-center gap-2 bg-[#c8ff00] text-black py-3
+                                 hover:bg-yellow-300 transition-colors duration-200"
+                      style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase",
+                        clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}>
+                      Seguir comprando →
+                    </Link>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
         )}
       </div>
 

@@ -330,7 +330,7 @@ export default function ProductDetails({ id }: { id: number }) {
               {/* Precio */}
               <div className="flex items-baseline gap-4">
                 <span
-                  className="text-[#c8ff00]"
+                  className="text-[#9e00c6]"
                   style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2rem, 4vw, 3rem)", letterSpacing: "0.02em" }}
                 >
                   {formatMoney(product.precio)}

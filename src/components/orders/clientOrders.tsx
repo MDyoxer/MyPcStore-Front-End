@@ -7,29 +7,15 @@ import { GetOrderUserItems, orderItems } from "@/src/actions/orders/get-orders-u
 import { useAuth } from "@/src/context/AuthContext";
 import { formatDateTime } from "@/src/utils/formatDateTime";
 import { formatMoney } from "@/src/utils/formatMoney";
-import { ShoppingBag, ChevronRight, Clock, CheckCircle2, XCircle, Truck, Package, Search, X, ArrowUpDown } from "lucide-react";
+import { getStatus } from "@/src/utils/orderStatus";
+import { ShoppingBag, ChevronRight, Search, X, ArrowUpDown } from "lucide-react";
 import Loading from "../ui/loading";
-
-// ─── STATUS CONFIG ────────────────────────────────────────────────────────────
-type StatusKey = "pendiente" | "procesando" | "enviado" | "entregado" | "cancelado" | string;
-
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; icon: React.ElementType }> = {
-  pendiente:   { label: "Pendiente",   color: "#c8ff00", bg: "rgba(200,255,0,0.06)",   border: "rgba(200,255,0,0.25)",   icon: Clock         },
-  procesando:  { label: "Procesando",  color: "#a855f7", bg: "rgba(168,85,247,0.06)",  border: "rgba(168,85,247,0.25)",  icon: Package       },
-  enviado:     { label: "Enviado",     color: "#00e5ff", bg: "rgba(0,229,255,0.06)",   border: "rgba(0,229,255,0.25)",   icon: Truck         },
-  entregado:   { label: "Entregado",   color: "#c8ff00", bg: "rgba(200,255,0,0.06)",   border: "rgba(200,255,0,0.25)",   icon: CheckCircle2  },
-  cancelado:   { label: "Cancelado",   color: "#ef4444", bg: "rgba(239,68,68,0.06)",   border: "rgba(239,68,68,0.25)",   icon: XCircle       },
-};
-
-const getStatus = (s: string) => STATUS_CONFIG[s?.toLowerCase()] ?? {
-  label: s, color: "#52525b", bg: "rgba(82,82,91,0.06)", border: "rgba(82,82,91,0.2)", icon: Clock,
-};
 
 type SortKey = "date-desc" | "date-asc" | "total-desc" | "total-asc";
 
 // ─── STATUS BADGE ─────────────────────────────────────────────────────────────
-function StatusBadge({ status }: { status: string }) {
-  const cfg = getStatus(status);
+function StatusBadge({ pagado }: { pagado: boolean }) {
+  const cfg = getStatus(pagado ? "entregado" : "pendiente");
   const Icon = cfg.icon;
   return (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1"
@@ -46,7 +32,8 @@ function StatusBadge({ status }: { status: string }) {
 
 // ─── ORDER ROW ────────────────────────────────────────────────────────────────
 function OrderRow({ order, index }: { order: orderItems; index: number }) {
-  const cfg = getStatus(order.status);
+  //COLOR id
+  const cfg = getStatus(order.pagado ? "entregado" : "pendiente");
 
   return (
     <motion.li
@@ -69,7 +56,7 @@ function OrderRow({ order, index }: { order: orderItems; index: number }) {
 
         {/* Número de orden */}
         <div className="shrink-0 flex flex-col gap-0.5">
-          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "8px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#3f3f46" }}>
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#c8ff00" }}>
             Orden
           </span>
           <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.5rem", letterSpacing: "0.05em", color: cfg.color, lineHeight: 1 }}>
@@ -81,7 +68,7 @@ function OrderRow({ order, index }: { order: orderItems; index: number }) {
 
         {/* Fecha */}
         <div className="flex flex-col gap-0.5 shrink-0">
-          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "8px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#c8ff00" }}>
             Fecha pedido
           </span>
           <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#71717a" }}>
@@ -93,7 +80,7 @@ function OrderRow({ order, index }: { order: orderItems; index: number }) {
 
         {/* Status */}
         <div className="shrink-0">
-          <StatusBadge status={order.status} />
+          <StatusBadge pagado={order.pagado} />
         </div>
 
         {/* Total */}
@@ -146,13 +133,13 @@ export default function ClientOrders() {
   }, [getIdToken]);
 
   // Statuses únicos para filtro
-  const statuses = ["all", ...Array.from(new Set(orders.map((o) => o.status?.toLowerCase()).filter(Boolean)))];
+  const statuses = ["all", ...Array.from(new Set(orders.map((o) => o.pagado?.toString()).filter(Boolean)))];
 
   const filtered = orders
     .filter((o) => {
       const q = search.toLowerCase();
-      const matchSearch = !q || String(o.idOrden).includes(q) || o.status?.toLowerCase().includes(q);
-      const matchStatus = statusFilter === "all" || o.status?.toLowerCase() === statusFilter;
+      const matchSearch = !q || String(o.idOrden).includes(q) || o.pagado?.toString().includes(q);
+      const matchStatus = statusFilter === "all" || o.pagado?.toString().toLowerCase() === statusFilter;
       return matchSearch && matchStatus;
     })
     .sort((a, b) => {
@@ -282,7 +269,7 @@ export default function ClientOrders() {
           </div>
 
           {/* Contador */}
-          <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
+          <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#FFFFFF" }}>
             {filtered.length === 0 ? "Sin resultados" : `${filtered.length} ${filtered.length === 1 ? "orden" : "órdenes"}`}
           </div>
         </motion.div>
