@@ -23,6 +23,12 @@ export default function CheckoutForm({ orderId }: { orderId: number }) {
     });
 
     if (submitError) {
+      // Si el PaymentIntent ya no es válido (p. ej. fue cancelado por un
+      // createCheckout posterior), recargar para obtener uno nuevo.
+      if (submitError.code === "payment_intent_unexpected_state") {
+        window.location.reload();
+        return;
+      }
       // Si Stripe exige redirect (ej. Link), sigue la URL que devuelve
       const redirectUrl =
         submitError.type === "card_error" &&

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
 import { motion, AnimatePresence } from "motion/react";
@@ -86,8 +86,12 @@ export default function CheckoutClient() {
   const { getIdToken }                              = useAuth();
   const [checkout, setCheckout]                     = useState<checkoutResponse | null>(null);
   const [error, setError]                           = useState<string | null>(null);
+  const requestedRef                                = useRef(false);
 
   useEffect(() => {
+    if (requestedRef.current) return;
+    requestedRef.current = true;
+
     let mounted = true;
     (async () => {
       const idToken = await getIdToken();
