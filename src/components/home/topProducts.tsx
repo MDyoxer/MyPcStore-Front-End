@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback } from "react"
 import { formatMoney } from "@/src/utils/formatMoney"
 import { slugify } from "@/src/utils/slugify"
 import { useProductAction } from "@/src/hooks/useProductAction"
-import { FireParticles } from "../ui/fire-animation"
+import { FireParticles } from "../ui/three/fire-animation"
 // ─── HOOK: carrito por producto ───────────────────────────────────────────────
 function useProductCart() {
   const [activeCart, setActiveCart] = useState<number | null>(null)
@@ -316,9 +316,9 @@ function WeeklyCountdown() {
 
     {/* resto del contenido igual... */}
     <span
-      style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#ef4444" }}
+      style={{ fontFamily: "'Space Mono', monospace", fontSize: "15px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#ef4444" }}
     >
-      ⚡ Ofertas terminan en
+      ⚡ Ofertas terminan en ⚡
     </span>
 
     <div className="flex items-center gap-2">

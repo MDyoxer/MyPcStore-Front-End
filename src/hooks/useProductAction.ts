@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { AddFavoriteItem } from "../actions/favorites/add-favorite";
-import { AddToCart } from "../actions/cart/add-to-cart";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/cartContext";
 
 type UseProductActionParams = {
     onConfirmCart?: (id: number) => void;
@@ -10,6 +10,7 @@ type UseProductActionParams = {
 
 export function useProductAction({ onConfirmCart, getQuantity }: UseProductActionParams = {}) {
     const { getIdToken } = useAuth();
+    const { addToCart } = useCart();
     //add a item to favorite section
     const handleFavoriteItem = useCallback(async (idProducto: number) => {
         const idToken = await getIdToken();
@@ -23,15 +24,8 @@ export function useProductAction({ onConfirmCart, getQuantity }: UseProductActio
     }, [getIdToken]);
     //add a item to cart section
     const handleAddToCart = useCallback(async (idProducto: number, cantidad: number) => {
-        const idToken = await getIdToken();
-        if (!idToken) return;
-
-        try {
-            await AddToCart(idToken, { idProducto, cantidad });
-        } catch (error) {
-            console.error("Error al agregar al carrito:", error);
-        }
-    }, [getIdToken]);
+        await addToCart(idProducto, cantidad);
+    }, [addToCart]);
 
     //confirm and add a item to cart section
     const confirmAndAdd = useCallback((id: number) => {

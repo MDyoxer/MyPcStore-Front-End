@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Sun, Bell, ShoppingCart, Heart, Search, Menu, X, User, Cpu, DoorOpen, Package } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/src/context/cartContext";
+
 const navLinks = [
   { label: "Productos", href: "/allProducts" },
   { label: "Equipos", href: "/" },
@@ -19,6 +21,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, loading, signOutUser } = useAuth();
+  const { count } = useCart();
   const router = useRouter();
   const handleSignOut = async () => {
     try {
@@ -69,8 +72,13 @@ export default function Navbar() {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#c8ff00] rounded-full" />
           </button>
           {/* Cart section */}
-          <Link href="/cart" className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all duration-200 active:scale-90">
+          <Link href="/cart" className="relative p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all duration-200 active:scale-90">
             <ShoppingCart className="w-5 h-5" />
+            {count > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-4.5 h-4.5 px-1 bg-[#c8ff00] text-black text-[10px] font-bold rounded-full flex items-center justify-center">
+                {count > 99 ? "99+" : count}
+              </span>
+            )}
           </Link>
           {/* Favorite products */}
           <Link href="/favorites" className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all duration-200 active:scale-90">

@@ -274,7 +274,7 @@ export default function FavoriteProducts() {
         {/* ── LISTA ── */}
         {favItems.length === 0 ? (
           // Estado vacío
-          <div className="flex flex-col items-center justify-center py-32 gap-6 border border-yellow-400">
+          <div className="flex flex-col items-center justify-center py-32 gap-6 border border-zinc-800/40">
             <Heart className="w-12 h-12 text-zinc-900" />
             <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(4rem, 10vw, 7rem)", color: "white", WebkitTextStroke: "1px rgba(168,85,247,0.15)" }}>
               VACÍO

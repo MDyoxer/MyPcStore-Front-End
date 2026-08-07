@@ -3,11 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import type { StripeError } from "@stripe/stripe-js";
+import { useCart } from "@/src/context/cartContext";
 
 export default function CheckoutForm({ orderId }: { orderId: number }) {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
+  const { clear } = useCart();
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
@@ -32,7 +35,8 @@ export default function CheckoutForm({ orderId }: { orderId: number }) {
       // Si Stripe exige redirect (ej. Link), sigue la URL que devuelve
       const redirectUrl =
         submitError.type === "card_error" &&
-        (submitError as any).payment_intent?.next_action?.redirect_to_url?.url;
+        (submitError as StripeError & { payment_intent?: { next_action?: { redirect_to_url?: { url: string } } } })
+          .payment_intent?.next_action?.redirect_to_url?.url;
       if (redirectUrl) {
         window.location.href = redirectUrl;
         return;
@@ -42,6 +46,7 @@ export default function CheckoutForm({ orderId }: { orderId: number }) {
       return;
     }
 
+    clear();
     router.push(`/orders/${orderId}`);
   };
 
