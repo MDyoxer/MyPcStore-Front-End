@@ -80,7 +80,7 @@ function CartRow({
                             src={item.imagen}
                             alt={item.nombre}
                             fill
-
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                             className="object-contain transition-transform duration-500 group-hover:scale-105"
                         />
                     ) : (
@@ -183,7 +183,7 @@ export default function Cart() {
     const [items, setItems] = useState<cartItems[]>([]);
     const [loaded, setLoaded] = useState(false);
    
-    const { getIdToken } = useAuth();
+    const { user, loading: authLoading, getIdToken } = useAuth();
     const router = useRouter();
     const quantityTimersRef = useRef<Record<number, ReturnType<typeof setTimeout> | undefined>>({});
     // get cart information
@@ -194,18 +194,20 @@ export default function Cart() {
         } catch (e) {
             console.error(e);
         } finally {
-            setTimeout(() => setLoaded(true), 500);
+            setLoaded(true);
         }
     }, []);
 
     //get idToken and fetch cart data when user state changes
     useEffect(() => {
+        if (authLoading) return;
+        if (!user) { setLoaded(true); return; }
         (async () => {
             const idToken = await getIdToken();
-            if (!idToken) { setLoaded(true); return; }
-            await fetchDataCart(idToken);
+            if (idToken) await fetchDataCart(idToken);
+            else setLoaded(true);
         })();
-    }, [getIdToken, fetchDataCart])
+    }, [authLoading, user, getIdToken, fetchDataCart])
 
     useEffect(() => {
         return () => {

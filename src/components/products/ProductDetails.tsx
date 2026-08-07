@@ -18,7 +18,7 @@ import { GetOneProduct, Product } from "@/src/actions/products/get-one-product";
 import { useState, useEffect } from "react";
 import { formatMoney } from "@/src/utils/formatMoney";
 import { useProductAction } from "@/src/hooks/useProductAction";
-
+import { useRouter } from "next/navigation";
 // ─── BADGE DE STOCK ──────────────────────────────────────────────────────────
 function StockBadge({ stock }: { stock: number }) {
   if (stock === 0) {
@@ -163,8 +163,8 @@ export default function ProductDetails({ id }: { id: number }) {
   const [addedToCart, setAddedToCart] = useState(false);
   const [liked, setLiked] = useState(false)
   const { handleFavoriteItem, handleAddToCart } = useProductAction();
-  
-  
+  const router = useRouter();
+
   useEffect(() => {
     const load = async () => {
       const data = await GetOneProduct(id);
@@ -373,6 +373,7 @@ export default function ProductDetails({ id }: { id: number }) {
 
                 {/* Comprar ahora */}
                 <button
+                  onClick={() => router.push(`/checkout?producto=${product.id}&cantidad=${qty}`)}
                   disabled={outOfStock}
                   className="flex-1 flex items-center justify-center gap-2 bg-[#c8ff00] text-black
                              disabled:opacity-30 disabled:cursor-not-allowed

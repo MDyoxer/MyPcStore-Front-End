@@ -11,7 +11,8 @@ import CheckoutForm from "./checkoutForm";
 import Loading from "../ui/loading";
 import { ShieldCheck, Lock, CreditCard, ArrowLeft, AlertTriangle } from "lucide-react";
 import Link from "next/link";
-
+import { useSearchParams } from "next/navigation";
+import { CreateDirectCheckout } from "@/src/actions/orders/create-direct-checkout";
 // ─── TRUST BADGES ─────────────────────────────────────────────────────────────
 const BADGES = [
   { icon: Lock,        label: "Pago cifrado SSL" },
@@ -83,14 +84,18 @@ function ErrorState({ message }: { message: string }) {
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 export default function CheckoutClient() {
-  const { getIdToken }                              = useAuth();
-  const [checkout, setCheckout]                     = useState<checkoutResponse | null>(null);
-  const [error, setError]                           = useState<string | null>(null);
-  const requestedRef                                = useRef(false);
-
-  useEffect(() => {
+  const { getIdToken } = useAuth();
+  const [checkout, setCheckout] = useState<checkoutResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const requestedRef = useRef(false);
+  const searchParams = useSearchParams();
+   useEffect(() => {
     if (requestedRef.current) return;
     requestedRef.current = true;
+
+    const productId = Number(searchParams.get("producto"));
+    const quantity  = Number(searchParams.get("cantidad"));
+    const isDirect  = Number.isFinite(productId) && productId > 0;
 
     let mounted = true;
     (async () => {
@@ -100,14 +105,20 @@ export default function CheckoutClient() {
         return;
       }
       try {
-        const data = await CreateCheckout(idToken);
+        const data = isDirect
+          ? await CreateDirectCheckout(idToken, productId, quantity > 0 ? quantity : 1)
+          : await CreateCheckout(idToken);
         if (mounted) setCheckout(data);
       } catch {
-        if (mounted) setError("No se pudo iniciar el checkout. Verifica tu carrito e inténtalo de nuevo.");
+        if (mounted) setError(
+          isDirect
+            ? "No se pudo iniciar el pago directo. Verifica el producto e inténtalo de nuevo."
+            : "No se pudo iniciar el checkout. Verifica tu carrito e inténtalo de nuevo."
+        );
       }
     })();
-    return () => { mounted = false; };
-  }, [getIdToken]);
+    return () => { mounted = false; requestedRef.current = false; };  // ← fix StrictMode
+  }, [getIdToken, searchParams]);
 
   if (error)    return <ErrorState message={error} />;
   if (!checkout) return <Loading />;
@@ -191,7 +202,7 @@ export default function CheckoutClient() {
         }} />
 
       {/* Orb morado */}
-      <div aria-hidden className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none"
+      <div aria-hidden className="absolute top-0 right-0 w-125 h-125 pointer-events-none"
         style={{ background: "radial-gradient(circle, rgba(168,85,247,0.06) 0%, transparent 70%)", filter: "blur(60px)" }} />
 
       <div className="max-w-2xl mx-auto px-4 pt-10 pb-24 relative">

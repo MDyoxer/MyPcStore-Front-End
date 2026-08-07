@@ -50,7 +50,7 @@ function FavRow({
 
       {/* Número */}
       <span className="hidden sm:flex shrink-0 w-7 items-center justify-center"
-        style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.6rem", color: "#27272a" }}>
+        style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.6rem", color: "#c8ff00" }}>
         {String(index + 1).padStart(2, "0")}
       </span>
       {/* TODO: imagen y titulo deben mandar a product id */}
@@ -83,7 +83,7 @@ function FavRow({
           {item.nombre}
         </Link>
 
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.1em", color: "#3f3f46" }}>
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.1em", color: "#FFFFFF" }}>
           Agregado: {formatDateTime(item.agregado)}
         </span>
       </div>
@@ -266,7 +266,7 @@ export default function FavoriteProducts() {
           </div>
         </div>
 
-        {/* Contador */}
+        {/* Contador fav */}
         <div className="mb-4" style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
           {filtered.length === 0 && search ? "Sin resultados" : `${filtered.length} ${filtered.length === 1 ? "producto" : "productos"}`}
         </div>
@@ -274,7 +274,7 @@ export default function FavoriteProducts() {
         {/* ── LISTA ── */}
         {favItems.length === 0 ? (
           // Estado vacío
-          <div className="flex flex-col items-center justify-center py-32 gap-6 border border-zinc-800/40">
+          <div className="flex flex-col items-center justify-center py-32 gap-6 border border-yellow-400">
             <Heart className="w-12 h-12 text-zinc-900" />
             <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(4rem, 10vw, 7rem)", color: "white", WebkitTextStroke: "1px rgba(168,85,247,0.15)" }}>
               VACÍO

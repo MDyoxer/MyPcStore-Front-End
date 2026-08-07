@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback } from "react"
 import { formatMoney } from "@/src/utils/formatMoney"
 import { slugify } from "@/src/utils/slugify"
 import { useProductAction } from "@/src/hooks/useProductAction"
-
+import { FireParticles } from "../ui/fire-animation"
 // ─── HOOK: carrito por producto ───────────────────────────────────────────────
 function useProductCart() {
   const [activeCart, setActiveCart] = useState<number | null>(null)
@@ -293,54 +293,68 @@ function WeeklyCountdown() {
 
   const pad = (n: number) => String(n).padStart(2, "0")
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: 0.1 }}
-      className="flex flex-col items-center gap-2"
-    >
-      <span
-        style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#ef4444" }}
-      >
-        ⚡ Ofertas terminan en
-      </span>
+ return (
+  <motion.div
+    initial={{ opacity: 0, y: 16 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, delay: 0.1 }}
+    className="relative flex flex-col items-center gap-2 px-10 py-4"  // añade relative px-10 py-4
+  >
+    {/* FUEGO */}
+    <FireParticles />
 
-      <div className="flex items-center gap-2">
-        {[
-          { val: timeLeft.dias, label: "días" },
-          { val: timeLeft.horas, label: "hrs" },
-          { val: timeLeft.minutos, label: "min" },
-          { val: timeLeft.segundos, label: "seg" },
-        ].map(({ val, label }, i) => (
-          <div key={label} className="flex items-center gap-2">
-            <div className="flex flex-col items-center">
-              <span
-                className="border border-red-500/40 bg-red-500/08 px-4 py-1.5 tabular-nums"
-                style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: "clamp(2.5rem, 5vw, 4rem)",
-                  lineHeight: 1,
-                  color: "#ef4444",
-                  boxShadow: "0 0 12px -4px rgba(239,68,68,0.4)",
-                  clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))",
-                }}
-              >
-                {pad(val)}
-              </span>
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "7px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#7f1d1d", marginTop: "4px" }}>
-                {label}
-              </span>
-            </div>
-            {i < 3 && (
-              <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(1.5rem, 3vw, 2.5rem)", color: "#ef4444", opacity: 0.5, marginBottom: "16px" }}>:</span>
-            )}
+    {/* Glow rojo de fondo */}
+    <div
+      aria-hidden
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        background: "radial-gradient(ellipse at 50% 100%, rgba(239,68,68,0.12) 0%, transparent 70%)",
+        filter: "blur(8px)",
+      }}
+    />
+
+    {/* resto del contenido igual... */}
+    <span
+      style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#ef4444" }}
+    >
+      ⚡ Ofertas terminan en
+    </span>
+
+    <div className="flex items-center gap-2">
+      {[
+        { val: timeLeft.dias,     label: "días" },
+        { val: timeLeft.horas,    label: "hrs"  },
+        { val: timeLeft.minutos,  label: "min"  },
+        { val: timeLeft.segundos, label: "seg"  },
+      ].map(({ val, label }, i) => (
+        <div key={label} className="flex items-center gap-2">
+          <div className="flex flex-col items-center">
+            <span
+              className="border border-red-500/40 bg-red-500/08 px-4 py-1.5 tabular-nums"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: "clamp(2.5rem, 5vw, 4rem)",
+                lineHeight: 1,
+                color: "#ef4444",
+                boxShadow: "0 0 12px -4px rgba(239,68,68,0.4)",
+                clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))",
+              }}
+            >
+              {pad(val)}
+            </span>
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "7px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#7f1d1d", marginTop: "4px" }}>
+              {label}
+            </span>
           </div>
-        ))}
-      </div>
-    </motion.div>
-  )
+          {i < 3 && (
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(1.5rem, 3vw, 2.5rem)", color: "#ef4444", opacity: 0.5, marginBottom: "16px" }}>:</span>
+          )}
+        </div>
+      ))}
+    </div>
+  </motion.div>
+)
 }
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
