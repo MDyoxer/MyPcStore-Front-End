@@ -293,7 +293,7 @@ export default function FavoriteProducts() {
         ) : filtered.length === 0 ? (
           // Sin resultados de búsqueda
           <div className="flex flex-col items-center justify-center py-20 gap-4 border border-zinc-800/40">
-            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "4rem", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.15)" }}>
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2.25rem, 9vw, 5rem)", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.15)" }}>
               SIN RESULTADOS
             </span>
             <button onClick={() => setSearch("")}

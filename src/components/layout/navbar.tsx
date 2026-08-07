@@ -43,8 +43,8 @@ export default function Navbar() {
             <Cpu className="w-5 h-5 text-black" />
           </div>
           <span
-            className="min-w-0 whitespace-nowrap text-[1.45rem] sm:text-[1.8rem] text-white group-hover:text-[#c8ff00] transition-colors duration-200"
-            style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.8rem", letterSpacing: "0.1em" }}
+            className="min-w-0 whitespace-nowrap text-white group-hover:text-[#c8ff00] transition-colors duration-200"
+            style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(1.05rem, 4vw, 1.8rem)", letterSpacing: "0.08em" }}
           >
             MyPC<span className="text-[#c8ff00]">Store</span>
           </span>

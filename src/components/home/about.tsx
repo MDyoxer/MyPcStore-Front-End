@@ -2,7 +2,7 @@
 import { motion } from "motion/react";
 import { Zap, Shield, Microscope } from "lucide-react";
 import Image from "next/image";
-
+import GamingCase from "../ui/three/AMD";
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 const STATS = [
   { num: "12+", label: "Años de experiencia" },
@@ -36,6 +36,8 @@ export default function About() {
 
       {/* ── HERO ── */}
       <section className="max-w-7xl mx-auto px-4 pt-20 pb-16 relative">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-14 lg:gap-16">
+        <div className="min-w-0">
         <motion.div
           initial={{ opacity: 0, y: -16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -74,6 +76,11 @@ export default function About() {
           creadores y profesionales las piezas que realmente marcan la diferencia. No vendemos productos,
           entregamos ventaja competitiva.
         </motion.p>
+        </div>
+        <div className="flex justify-center lg:shrink-0">
+          <GamingCase size={340} />
+        </div>
+        </div>
       </section>
 
       {/* ── STATS ── */}

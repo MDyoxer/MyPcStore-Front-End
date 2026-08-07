@@ -593,7 +593,7 @@ export default function AllProducts() {
             {/* Grid */}
             {loading ? <LoadingScreen /> : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-32 gap-4 border border-zinc-800/40">
-                <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "5rem", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.15)" }}>
+                <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(4rem, 12vw, 6rem)", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.15)" }}>
                   VACÍO
                 </span>
                 <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#52525b" }}>

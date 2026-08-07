@@ -232,7 +232,7 @@ function TimelineSection() {
 
         <div className="relative flex flex-col gap-0">
           {/* Línea vertical */}
-          <div className="absolute left-[60px] sm:left-[72px] top-0 bottom-0 w-px bg-zinc-800/60" />
+          <div className="absolute left-[52px] sm:left-[72px] top-0 bottom-0 w-px bg-zinc-800/60" />
 
           {TIMELINE.map((item, i) => (
             <motion.div
@@ -241,17 +241,17 @@ function TimelineSection() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.55, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-              className="relative flex gap-6 sm:gap-10 pb-12 last:pb-0 group p-4"
+              className="relative flex gap-3 sm:gap-10 pb-12 last:pb-0 group p-2 sm:p-4"
             >
               {/* Año */}
-              <div className="flex-shrink-0 w-[60px] sm:w-[72px] flex flex-col items-end pt-1">
+              <div className="flex-shrink-0 w-[52px] sm:w-[72px] flex flex-col items-end pt-1">
                 <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1rem", color: "#c8ff00", letterSpacing: "0.05em" }}>
                   {item.year}
                 </span>
               </div>
 
               {/* Dot en la línea */}
-              <div className="absolute left-[56px] sm:left-[68px] top-2 w-[9px] h-[9px] bg-black border-2 border-[#c8ff00] rotate-45
+              <div className="absolute left-[48px] sm:left-[68px] top-2 w-[9px] h-[9px] bg-black border-2 border-[#c8ff00] rotate-45
                               group-hover:bg-[#c8ff00] transition-colors duration-300" />
 
               {/* Contenido */}

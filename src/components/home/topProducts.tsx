@@ -299,7 +299,7 @@ function WeeklyCountdown() {
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.5, delay: 0.1 }}
-    className="relative flex flex-col items-center gap-2 px-10 py-4"  // añade relative px-10 py-4
+    className="relative flex flex-col items-center gap-2 px-2 py-4 sm:px-10" 
   >
     {/* FUEGO */}
     <FireParticles />
@@ -316,25 +316,25 @@ function WeeklyCountdown() {
 
     {/* resto del contenido igual... */}
     <span
-      style={{ fontFamily: "'Space Mono', monospace", fontSize: "15px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#ef4444" }}
+      style={{ fontFamily: "'Space Mono', monospace", fontSize: "clamp(11px, 3.5vw, 15px)", letterSpacing: "0.2em", textTransform: "uppercase", color: "#ef4444" }}
     >
       ⚡ Ofertas terminan en ⚡
     </span>
 
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 sm:gap-2">
       {[
-        { val: timeLeft.dias,     label: "días" },
-        { val: timeLeft.horas,    label: "hrs"  },
-        { val: timeLeft.minutos,  label: "min"  },
-        { val: timeLeft.segundos, label: "seg"  },
+        { val: timeLeft.dias,     label: "." },
+        { val: timeLeft.horas,    label: "-"  },
+        { val: timeLeft.minutos,  label: "_"  },
+        { val: timeLeft.segundos, label: ","  },
       ].map(({ val, label }, i) => (
-        <div key={label} className="flex items-center gap-2">
+        <div key={label} className="flex items-center gap-1.5 sm:gap-2">
           <div className="flex flex-col items-center">
             <span
-              className="border border-red-500/40 bg-red-500/08 px-4 py-1.5 tabular-nums"
+              className="border border-red-500/40 bg-red-500/08 px-2 sm:px-4 py-1.5 tabular-nums"
               style={{
                 fontFamily: "'Bebas Neue', sans-serif",
-                fontSize: "clamp(2.5rem, 5vw, 4rem)",
+                fontSize: "clamp(1.75rem, 6vw, 4rem)",
                 lineHeight: 1,
                 color: "#ef4444",
                 boxShadow: "0 0 12px -4px rgba(239,68,68,0.4)",
@@ -348,7 +348,7 @@ function WeeklyCountdown() {
             </span>
           </div>
           {i < 3 && (
-            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(1.5rem, 3vw, 2.5rem)", color: "#ef4444", opacity: 0.5, marginBottom: "16px" }}>:</span>
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(1.1rem, 3vw, 2.5rem)", color: "#ef4444", opacity: 0.5, marginBottom: "16px" }}>:</span>
           )}
         </div>
       ))}
@@ -478,7 +478,7 @@ export default function TopProducts({ onLoaded }: { onLoaded?: () => void }) {
         {!loading && products.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4 border border-zinc-800/50">
             <span
-              style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "4rem", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.2)" }}
+              style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(3.5rem, 12vw, 5rem)", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.2)" }}
             >
               VACÍO
             </span>

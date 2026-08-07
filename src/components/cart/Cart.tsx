@@ -92,7 +92,7 @@ function CartRow({
                     {/* Acento esquina */}
                     <span
                         aria-hidden
-                        className="absolute top-0 right-0 w-[w-2] h-[h-2] bg-[#c8ff00]"
+                        className="absolute top-0 right-0 w-2 h-2 bg-[#c8ff00]"
                         style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }}
                     />
                 </div>
@@ -204,8 +204,8 @@ export default function Cart() {
     //get idToken and fetch cart data when user state changes
     useEffect(() => {
         if (authLoading) return;
-        if (!user) { setLoaded(true); return; }
         (async () => {
+            if (!user) { setLoaded(true); return; }
             const idToken = await getIdToken();
             if (idToken) await fetchDataCart(idToken);
             else setLoaded(true);
