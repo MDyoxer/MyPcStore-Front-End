@@ -20,6 +20,7 @@ const navLinks = [
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { user, loading, signOutUser } = useAuth();
   const { count } = useCart();
   const router = useRouter();
@@ -49,18 +50,21 @@ export default function Navbar() {
             MyPC<span className="text-[#c8ff00]">Store</span>
           </span>
         </Link>
-
-        <div className="hidden md:flex relative flex-1 max-w-md mx-2 group">
+        <form
+          onSubmit={(e) => { e.preventDefault(); router.push(`/allProducts?search=${encodeURIComponent(searchQuery.trim())}`); }}
+          className="hidden md:flex relative flex-1 max-w-md mx-2 group"
+        >
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4 group-focus-within:text-purple-400 transition-colors duration-300" />
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Busca laptops o equipos..."
             className="w-full bg-zinc-900 border border-zinc-700 rounded-full pl-10 pr-4 py-2 text-sm text-white placeholder-zinc-500 
                        focus:outline-none focus:border-[#c8ff00] focus:ring-1 focus:ring-purple-500/50 
                        transition-all duration-300 group-focus-within:shadow-[0_0_12px_-3px_#a855f7]"
           />
-        </div>
-
+        </form>
         <div className="flex shrink-0 items-center gap-2 sm:gap-4">
           {/* Theme */}
           <button className="hidden sm:flex p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all duration-200 active:scale-90">

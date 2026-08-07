@@ -32,7 +32,7 @@ function useCart() {
       [id]: Math.min((prev[id] ?? 1) + 1, maxStock),
     })),
     []);
-    
+
   const decrease = (id: number) =>
     setQuantities((p) => {
       const next = (p[id] ?? 1) - 1;
@@ -243,15 +243,14 @@ function FilterCheckbox({ label, checked, onChange, count, accent = "#c8ff00" }:
 }
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
-export default function AllProducts() {
+export default function AllProducts({ initialSearch = "" }: { initialSearch?: string }) {
   const [products, setProducts] = useState<Products[]>([]);
   const [categories, setCategories] = useState<Categories[]>([]);
   const [brands, setBrands] = useState<Brands[]>([]);
   const [loading, setLoading] = useState(true);
   const [loaded, setLoaded] = useState(false);
-
+  const [search, setSearch] = useState(initialSearch);
   // Filtros
-  const [search, setSearch] = useState("");
   const [selectedCats, setSelectedCats] = useState<Set<string>>(new Set());
   const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 999999]);
@@ -264,6 +263,10 @@ export default function AllProducts() {
     onConfirmCart: cart.confirm,
     getQuantity: cart.getQty,
   });
+
+  useEffect(() => {
+  setSearch(initialSearch);
+}, [initialSearch]);
 
   useEffect(() => {
     (async () => {
