@@ -250,6 +250,11 @@ export default function AllProducts({ initialSearch = "" }: { initialSearch?: st
   const [loading, setLoading] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState(initialSearch);
+  const [prevInitialSearch, setPrevInitialSearch] = useState(initialSearch);
+  if (initialSearch !== prevInitialSearch) {
+    setPrevInitialSearch(initialSearch);
+    setSearch(initialSearch);
+  }
   // Filtros
   const [selectedCats, setSelectedCats] = useState<Set<string>>(new Set());
   const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
@@ -263,10 +268,6 @@ export default function AllProducts({ initialSearch = "" }: { initialSearch?: st
     onConfirmCart: cart.confirm,
     getQuantity: cart.getQty,
   });
-
-  useEffect(() => {
-  setSearch(initialSearch);
-}, [initialSearch]);
 
   useEffect(() => {
     (async () => {

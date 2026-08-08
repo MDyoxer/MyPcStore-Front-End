@@ -1,4 +1,3 @@
-import Allproducts from "@/src/components/products/allproducts";
 //TODO: Dashboard reservado para admin
 export default function DashboardPage() {
     return (

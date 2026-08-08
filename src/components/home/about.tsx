@@ -1,8 +1,8 @@
 "use client";
 import { motion } from "motion/react";
 import { Zap, Shield, Microscope } from "lucide-react";
-import Image from "next/image";
-import GamingCase from "../ui/three/AMD";
+import DetailedProcessorViewer from "../ui/three/AMD";
+import IntelProcessorViewer from "../ui/three/Intel";
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 const STATS = [
   { num: "12+", label: "Años de experiencia" },
@@ -77,9 +77,6 @@ export default function About() {
           entregamos ventaja competitiva.
         </motion.p>
         </div>
-        <div className="flex justify-center lg:shrink-0">
-          <GamingCase size={340} />
-        </div>
         </div>
       </section>
 
@@ -116,23 +113,12 @@ export default function About() {
       <section className="max-w-7xl mx-auto px-4 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-zinc-800/30">
 
-          {/* Imagen */}
+          {/* Procesador 3D */}
           <div
-            className="relative bg-zinc-950 overflow-hidden group min-h-85"
+            className="relative bg-zinc-950 overflow-hidden group min-h-85 flex items-center justify-center"
             style={{ clipPath: "polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%)" }}
           >
-            <Image
-              src="/ryzen9800.png"
-              alt="AMD Ryzen 9 9950X"
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-            />
-            {/* Overlay morado profundo */}
-            <div
-              className="absolute inset-0"
-              style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.25) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.85) 100%)" }}
-            />
+            <DetailedProcessorViewer size={340} />
             {/* Scanlines */}
             <div
               aria-hidden
@@ -181,16 +167,16 @@ export default function About() {
               className="text-white leading-none"
               style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2rem, 4vw, 3.2rem)", letterSpacing: "0.03em" }}
             >
-              RYZEN 9{" "}
-              <span className="text-[#c8ff00]">9950X</span>
+              AMD{" "}
+              <span className="text-[orange]">RYZEN</span>
             </h2>
 
             <p
               className="text-zinc-400 leading-relaxed"
               style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", lineHeight: "1.9", letterSpacing: "0.02em" }}
             >
-              Elegimos la arquitectura Zen 5 de AMD porque redefine lo que un procesador de consumo puede hacer.
-              Con <span className="text-zinc-200">16 núcleos y 32 hilos</span>, el Ryzen 9 9950X domina tanto
+              Elegimos la arquitectura Zen  de AMD porque redefine lo que un procesador de consumo puede hacer.
+              Con <span className="text-zinc-200">núcleos y hilos poderosos</span>,Ryzen domina tanto
               cargas de trabajo creativas como sesiones de juego más exigentes, sin comprometer eficiencia energética.
             </p>
 
@@ -248,11 +234,10 @@ export default function About() {
             </div>
 
             <h2
-              className="text-white leading-none"
+              className="text-blue-400 leading-none"
               style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2rem, 4vw, 3.2rem)", letterSpacing: "0.03em" }}
             >
               CORE ULTRA{" "}
-              <span className="text-purple-400">i9-14900K</span>
             </h2>
 
             <p
@@ -296,23 +281,12 @@ export default function About() {
             </div>
           </motion.div>
 
-          {/* Imagen */}
+          {/* Procesador 3D */}
           <div
-            className="relative bg-zinc-950 overflow-hidden group min-h-85 order-1 lg:order-2"
+            className="relative bg-zinc-950 overflow-hidden group min-h-105 flex items-center justify-center order-1 lg:order-2"
             style={{ clipPath: "polygon(16px 0, 100% 0, 100% 100%, 0 100%, 0 16px)" }}
           >
-            <Image
-              src="/I9.png"
-              alt="Intel Core i9-14900K"
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-            />
-            {/* Overlay azul/morado profundo */}
-            <div
-              className="absolute inset-0"
-              style={{ background: "linear-gradient(225deg, rgba(168,85,247,0.3) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.85) 100%)" }}
-            />
+            <IntelProcessorViewer size={400} />
             {/* Scanlines */}
             <div
               aria-hidden

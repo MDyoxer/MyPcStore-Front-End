@@ -213,8 +213,9 @@ export default function Cart() {
     }, [authLoading, user, getIdToken, fetchDataCart])
 
     useEffect(() => {
+        const timers = quantityTimersRef.current;
         return () => {
-            Object.values(quantityTimersRef.current).forEach((timer) => {
+            Object.values(timers).forEach((timer) => {
                 if (timer) clearTimeout(timer);
             });
         };
@@ -298,7 +299,7 @@ export default function Cart() {
         } catch (error) {
             console.error("Error al eliminar del carrito:", error);
         }
-    }, [getIdToken, adjust]);
+    }, [getIdToken, adjust, items]);
 
     const total = items.reduce((acc, i) => acc + i.precio * i.cantidad, 0);
     const totalItems = items.reduce((acc, i) => acc + i.cantidad, 0);

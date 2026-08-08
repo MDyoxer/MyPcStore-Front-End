@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
-import { Heart, Trash2, Search, X, ArrowUpDown, ImageOff, ShoppingCart } from "lucide-react";
+import { Heart, Trash2, Search, X, ArrowUpDown, ImageOff } from "lucide-react";
 import { GetFavItems, favItems } from "@/src/actions/favorites/get-favorites";
 import { DeleteFavorite } from "@/src/actions/favorites/delete-favorite";
 import { useAuth } from "@/src/context/AuthContext";

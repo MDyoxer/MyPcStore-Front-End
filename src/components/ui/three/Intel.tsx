@@ -69,17 +69,34 @@ function useRotateDrag(groupRef: React.RefObject<THREE.Group>) {
   }, [gl, groupRef]);
 }
 
-// ─── MODELO GLB DEL PROCESADOR (9800x3D CPU - LOW POLY) ───────────────────────
+// ─── MODELO GLB DEL PROCESADOR (Intel i7 4th Gen) ─────────────────────────────
 function ProcessorGroup() {
   const groupRef = useRef<THREE.Group>(null!);
+  const holderRef = useRef<THREE.Group>(null!);
   useRotateDrag(groupRef);
-  const gltf = useLoader(GLTFLoader, "/3d/amd/source/9800x3dlowpoly.glb");
+  const gltf = useLoader(GLTFLoader, "/3d/intel/intel_core_i9-11900k.glb");
+
+  useEffect(() => {
+    // Quitar el plano de fondo gigante que incluye el modelo de Sketchfab.
+    // Si solo se ocultara, Box3.setFromObject seguiría incluyéndolo en el encuadre.
+    const plane = gltf.scene.getObjectByName("Plane");
+    if (plane) plane.parent?.remove(plane);
+
+    // Auto-encuadre: centrar el chip y escalarlo a la altura objetivo
+    const box = new THREE.Box3().setFromObject(gltf.scene);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const targetHeight = 2.0;
+    const scale = targetHeight / Math.max(size.x, size.y);
+
+    holderRef.current.scale.setScalar(scale);
+    holderRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+  }, [gltf]);
 
   return (
     <group>
-      {/* El modelo GLB viene "acostado" sobre el plano XZ; se rota 90° en X para mirar a la cámara */}
-      <group rotation={[Math.PI / 2, 4.8, 0.3]} scale={0.6}>
-        <group ref={groupRef} rotation={[0, 0.35, 0]}>
+      <group ref={holderRef}>
+        <group ref={groupRef} rotation={[1, 0.55, 0]}>
           <primitive object={gltf.scene} />
         </group>
       </group>
@@ -97,19 +114,22 @@ export default function DetailedProcessorViewer({ size = 450 }: { size?: number 
         gl={{ powerPreference: "high-performance", antialias: true }}
       >
         {/* Ambient Light para relleno suave */}
-        <ambientLight intensity={0.6} />
+        <ambientLight intensity={1.4} />
 
         {/* Luz principal frontal (Luz blanca de estudio) */}
-        <directionalLight position={[4, 6, 6]} intensity={2.2} castShadow />
+        <directionalLight position={[4, 6, 6]} intensity={3} castShadow />
 
-        {/* Luz dorada lateral para acentuar cortes metálicos y capacitores */}
-        <directionalLight position={[-6, 2, 3]} color="#fef08a" intensity={1.8} />
+        {/* Luz dorada lateral para acentuar cortes metálicos */}
+        <directionalLight position={[-6, 2, 3]} color="#fef08a" intensity={4} />
 
-        {/* Rim Light trasero para perfilar el PCB verde */}
-        <pointLight position={[0, -4, -4]} color="#22c55e" intensity={2.5} distance={10} />
+        {/* Rim Light trasero para perfilar el PCB */}
+        <pointLight position={[0, -4, -4]} color="#22c55e" intensity={4} distance={10} />
 
         {/* Luz de relleno inferior */}
-        <pointLight position={[0, -3, 4]} color="#ffffff" intensity={0.8} />
+        <pointLight position={[0, -3, 4]} color="#ffffff" intensity={9} />
+
+        {/* Luz frontal directa para iluminar la cara del chip */}
+        <pointLight position={[0, 0, 3.5]} color="#ffffff" intensity={4} distance={2} />
 
         <ProcessorGroup />
       </Canvas>
