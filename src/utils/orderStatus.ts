@@ -1,4 +1,4 @@
-import type { ElementType } from "react";
+import type { LucideIcon } from "lucide-react";
 import { Clock, CheckCircle2, XCircle, Truck, Package } from "lucide-react";
 
 export type StatusKey = "pendiente" | "procesando" | "enviado" | "entregado" | "cancelado";
@@ -8,7 +8,7 @@ export type OrderStatusConfig = {
   color: string;
   bg: string;
   border: string;
-  icon: ElementType;
+  icon: LucideIcon;
 };
 
 export const STATUS_CONFIG: Record<StatusKey, OrderStatusConfig> = {

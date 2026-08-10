@@ -23,9 +23,9 @@ const SUBJECTS = [
 
 // ─── INPUT FIELD ──────────────────────────────────────────────────────────────
 function Field({
-  label, id, error, accent = "#c8ff00", children,
+  label, id, error, children,
 }: {
-  label: string; id: string; error?: string; accent?: string; children: React.ReactNode;
+  label: string; id: string; error?: string; children: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-1.5">

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
-import { Heart, Trash2, Search, X, ArrowUpDown, ImageOff, ShoppingCart } from "lucide-react";
+import { Heart, Trash2, Search, X, ArrowUpDown, ImageOff } from "lucide-react";
 import { GetFavItems, favItems } from "@/src/actions/favorites/get-favorites";
 import { DeleteFavorite } from "@/src/actions/favorites/delete-favorite";
 import { useAuth } from "@/src/context/AuthContext";
@@ -50,7 +50,7 @@ function FavRow({
 
       {/* Número */}
       <span className="hidden sm:flex shrink-0 w-7 items-center justify-center"
-        style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.6rem", color: "#27272a" }}>
+        style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.6rem", color: "#c8ff00" }}>
         {String(index + 1).padStart(2, "0")}
       </span>
       {/* TODO: imagen y titulo deben mandar a product id */}
@@ -83,7 +83,7 @@ function FavRow({
           {item.nombre}
         </Link>
 
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.1em", color: "#3f3f46" }}>
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.1em", color: "#FFFFFF" }}>
           Agregado: {formatDateTime(item.agregado)}
         </span>
       </div>
@@ -266,7 +266,7 @@ export default function FavoriteProducts() {
           </div>
         </div>
 
-        {/* Contador */}
+        {/* Contador fav */}
         <div className="mb-4" style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3f3f46" }}>
           {filtered.length === 0 && search ? "Sin resultados" : `${filtered.length} ${filtered.length === 1 ? "producto" : "productos"}`}
         </div>
@@ -293,7 +293,7 @@ export default function FavoriteProducts() {
         ) : filtered.length === 0 ? (
           // Sin resultados de búsqueda
           <div className="flex flex-col items-center justify-center py-20 gap-4 border border-zinc-800/40">
-            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "4rem", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.15)" }}>
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2.25rem, 9vw, 5rem)", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.15)" }}>
               SIN RESULTADOS
             </span>
             <button onClick={() => setSearch("")}

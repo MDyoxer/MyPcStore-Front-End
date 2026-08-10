@@ -6,6 +6,7 @@ export type orderItems = {
     total: number,
     pagado:boolean,
     statusEnvio?: string,
+    imgProductos: string[],
 }
 
 export async function GetOrderUserItems(idToken: string): Promise<orderItems[]> {

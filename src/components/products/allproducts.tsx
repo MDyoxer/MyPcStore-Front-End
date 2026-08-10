@@ -32,7 +32,7 @@ function useCart() {
       [id]: Math.min((prev[id] ?? 1) + 1, maxStock),
     })),
     []);
-    
+
   const decrease = (id: number) =>
     setQuantities((p) => {
       const next = (p[id] ?? 1) - 1;
@@ -243,15 +243,19 @@ function FilterCheckbox({ label, checked, onChange, count, accent = "#c8ff00" }:
 }
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
-export default function AllProducts() {
+export default function AllProducts({ initialSearch = "" }: { initialSearch?: string }) {
   const [products, setProducts] = useState<Products[]>([]);
   const [categories, setCategories] = useState<Categories[]>([]);
   const [brands, setBrands] = useState<Brands[]>([]);
   const [loading, setLoading] = useState(true);
   const [loaded, setLoaded] = useState(false);
-
+  const [search, setSearch] = useState(initialSearch);
+  const [prevInitialSearch, setPrevInitialSearch] = useState(initialSearch);
+  if (initialSearch !== prevInitialSearch) {
+    setPrevInitialSearch(initialSearch);
+    setSearch(initialSearch);
+  }
   // Filtros
-  const [search, setSearch] = useState("");
   const [selectedCats, setSelectedCats] = useState<Set<string>>(new Set());
   const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 999999]);
@@ -593,7 +597,7 @@ export default function AllProducts() {
             {/* Grid */}
             {loading ? <LoadingScreen /> : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-32 gap-4 border border-zinc-800/40">
-                <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "5rem", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.15)" }}>
+                <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(4rem, 12vw, 6rem)", color: "transparent", WebkitTextStroke: "1px rgba(200,255,0,0.15)" }}>
                   VACÍO
                 </span>
                 <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#52525b" }}>

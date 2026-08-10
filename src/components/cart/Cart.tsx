@@ -12,6 +12,7 @@ import { UpdateCartQuantity } from "@/src/actions/cart/update-cart-quantity";
 import { formatMoney } from "@/src/utils/formatMoney";
 import { slugify } from "@/src/utils/slugify";
 import { useAuth } from "@/src/context/AuthContext";
+import { useCart } from "@/src/context/cartContext";
 // ─── ESTADO VACÍO ────────────────────────────────────────────────────────────
 function EmptyCart() {
     return (
@@ -80,7 +81,7 @@ function CartRow({
                             src={item.imagen}
                             alt={item.nombre}
                             fill
-
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                             className="object-contain transition-transform duration-500 group-hover:scale-105"
                         />
                     ) : (
@@ -91,7 +92,7 @@ function CartRow({
                     {/* Acento esquina */}
                     <span
                         aria-hidden
-                        className="absolute top-0 right-0 w-[w-2] h-[h-2] bg-[#c8ff00]"
+                        className="absolute top-0 right-0 w-2 h-2 bg-[#c8ff00]"
                         style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }}
                     />
                 </div>
@@ -182,8 +183,8 @@ function CartRow({
 export default function Cart() {
     const [items, setItems] = useState<cartItems[]>([]);
     const [loaded, setLoaded] = useState(false);
-   
-    const { getIdToken } = useAuth();
+    const { sync, adjust } = useCart();
+    const { user, loading: authLoading, getIdToken } = useAuth();
     const router = useRouter();
     const quantityTimersRef = useRef<Record<number, ReturnType<typeof setTimeout> | undefined>>({});
     // get cart information
@@ -191,25 +192,30 @@ export default function Cart() {
         try {
             const data = await GetUserCart(idToken);
             setItems(data);
+            sync(data.reduce((acc, i) => acc + i.cantidad, 0));
+            sync(data.reduce((acc, i) => acc + i.cantidad, 0));
         } catch (e) {
             console.error(e);
         } finally {
-            setTimeout(() => setLoaded(true), 500);
+            setLoaded(true);
         }
-    }, []);
+    }, [sync]);
 
     //get idToken and fetch cart data when user state changes
     useEffect(() => {
+        if (authLoading) return;
         (async () => {
+            if (!user) { setLoaded(true); return; }
             const idToken = await getIdToken();
-            if (!idToken) { setLoaded(true); return; }
-            await fetchDataCart(idToken);
+            if (idToken) await fetchDataCart(idToken);
+            else setLoaded(true);
         })();
-    }, [getIdToken, fetchDataCart])
+    }, [authLoading, user, getIdToken, fetchDataCart])
 
     useEffect(() => {
+        const timers = quantityTimersRef.current;
         return () => {
-            Object.values(quantityTimersRef.current).forEach((timer) => {
+            Object.values(timers).forEach((timer) => {
                 if (timer) clearTimeout(timer);
             });
         };
@@ -243,6 +249,7 @@ export default function Cart() {
                 const nextQuantity = Math.min(item.cantidad + 1, item.stock);
                 if (nextQuantity !== item.cantidad) {
                     syncItemQuantity(item, nextQuantity);
+                    adjust(1);
                 }
                 return { ...item, cantidad: nextQuantity };
             })
@@ -255,6 +262,7 @@ export default function Cart() {
         // Si la cantidad actual es 1, decrementar a 0 significa eliminarlo del carrito y de la BD
         if (targetItem.cantidad <= 1) {
             handleRemoveItem(idCart);
+            adjust(-targetItem.cantidad);
         } else {
             setItems((prev) =>
                 prev.map((item) => {
@@ -262,6 +270,7 @@ export default function Cart() {
 
                     const nextQuantity = item.cantidad - 1;
                     syncItemQuantity(item, nextQuantity);
+                    adjust(-1);
                     return { ...item, cantidad: nextQuantity };
                 })
             );
@@ -279,6 +288,9 @@ export default function Cart() {
         }
 
         setItems((prev) => prev.filter((item) => item.idCarrito !== idCart));
+        if (targetItem) {
+            adjust(-targetItem.cantidad);
+        }
 
         try {
             const idToken = await getIdToken();
@@ -287,7 +299,7 @@ export default function Cart() {
         } catch (error) {
             console.error("Error al eliminar del carrito:", error);
         }
-    }, [getIdToken]);
+    }, [getIdToken, adjust, items]);
 
     const total = items.reduce((acc, i) => acc + i.precio * i.cantidad, 0);
     const totalItems = items.reduce((acc, i) => acc + i.cantidad, 0);
@@ -476,7 +488,7 @@ export default function Cart() {
                                     boxShadow: "0 0 24px -6px rgba(200,255,0,0.4)",
                                 }}
                             >
-                                Pagar ahora 
+                                Pagar ahora
                             </button>
 
                             {/* Seguir comprando */}
