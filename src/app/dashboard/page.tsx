@@ -1,8 +1,8 @@
-//TODO: Dashboard reservado para admin
+import Dashboard from "@/src/components/admin/dashboard"
 export default function DashboardPage() {
     return (
         <div>
-            <h1>ADMIN aqui</h1>
+            <Dashboard />
         </div>
     )
 }
