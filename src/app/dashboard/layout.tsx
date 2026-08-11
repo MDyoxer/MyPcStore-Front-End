@@ -7,11 +7,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <DashboardGuard>
+     <DashboardGuard>
       <div className="flex">
         <SideBar />
         <main className="flex-1 min-w-0">{children}</main>
       </div>
-    </DashboardGuard>
+     </DashboardGuard>
   );
 }

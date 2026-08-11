@@ -14,7 +14,7 @@ export type Products = {
 
 
 export async function GetProducts(): Promise<Products[]> {
-    const response = await fetch(buildApiUrl("/products/findAllProductsAdmin"), {
+    const response = await fetch(buildApiUrl("/products/findAllProducts"), {
         method: "GET",
         cache: "no-store",
     });

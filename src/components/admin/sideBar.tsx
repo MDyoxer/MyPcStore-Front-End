@@ -7,7 +7,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   LayoutDashboard, Package, PackagePlus, ShoppingBag,
-  MessageSquare, TrendingUp, BarChart2, PieChart,
+  MessageSquare, TrendingUp, BarChart2, PieChart, Edit,
   Users, Star, Tag, Truck, Settings, ChevronRight,
   Menu, X, Cpu, Bell, Shield,
 } from "lucide-react";
@@ -39,7 +39,8 @@ const NAV: NavGroup[] = [
     group: "Catálogo",
     items: [
       { label: "Productos",       href: "/dashboard/products",     icon: Package,     color: "#c8ff00" },
-      { label: "Agregar producto", href: "/dashboard/products/new", icon: PackagePlus, color: "#a855f7" },
+      { label: "Agregar producto", href: "/dashboard/products/newProduct", icon: PackagePlus, color: "#a855f7" },
+      { label: "Editar producto",  href: "/dashboard/products/editProduct", icon: Edit,     color: "#c8ff00" },
       { label: "Categorías",      href: "/admin/categories",   icon: Tag,         color: "#c8ff00" },
       { label: "Marcas",          href: "/admin/brands",       icon: Shield,      color: "#a855f7" },
     ],
