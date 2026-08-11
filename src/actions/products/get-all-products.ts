@@ -1,4 +1,4 @@
-//Get all products from the api and return them as a list of Product objects used on TopProducts.tsx
+//Get all products from the api and return them as a list of Product objects 
 "use client"
 import { buildApiUrl } from "@/src/utils/baseApiUrl"
 export type Products = {

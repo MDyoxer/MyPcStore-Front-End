@@ -4,7 +4,7 @@ import { GetBrands, Brands } from "@/src/actions/brands/get-all-brands";
 import { GetCategories, Categories } from "@/src/actions/categories/get-all-categories";
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Edit, Trash2, Search, X, LayoutGrid, List, ArrowUpDown, Package, ImageOff, TrendingUp } from "lucide-react";
+import { Edit, Trash2, Search, X, LayoutGrid, List, ArrowUpDown, Package, ImageOff, TrendingUp, Eye } from "lucide-react";
 import { formatMoney } from "@/src/utils/formatMoney";
 import Link from "next/link";
 import ConfirmModal from "../modals/confirmModal";
@@ -95,10 +95,13 @@ function GridCard({ product, index, onRequestedDesactivate }: { product: Product
                     <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase" }}>Editar</span>
                 </Link>
                 <button
-                onClick={() => onRequestedDesactivate(product)}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-600 hover:text-red-500 hover:bg-red-500/05 transition-all duration-200">
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase" }}>{product.active === 1 ? "Activar" : "Desactivar"}</span>
+                    onClick={() => onRequestedDesactivate(product)}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-600 hover:text-red-500 hover:bg-red-500/05 transition-all duration-200">
+                    {product.active === 1
+                        ? <Trash2 className="w-3.5 h-3.5" />
+                        : <Eye className="w-3.5 h-3.5" />}
+                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase" }}>{Number(product.active) === 1 ? "Desactivar" : "Activar"}</span>
+
                 </button>
             </div>
         </motion.div>
@@ -191,7 +194,7 @@ export default function ListProductsAdmin() {
     const [products, setProducts] = useState<Products[]>([]);
     const [view, setView] = useState<ViewMode>("grid");
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<ProductView | null>(null);   
+    const [selectedProduct, setSelectedProduct] = useState<ProductView | null>(null);
     const openDesactivateModal = (product: ProductView) => {
         setSelectedProduct(product);
         setIsModalOpen(true);
@@ -240,7 +243,7 @@ export default function ListProductsAdmin() {
 
     const totalVendidos = display.reduce((acc, p) => acc + p.vendidos, 0);
 
-  const handleDesactivarProd = async (idProd: number) => {
+    const handleDesactivarProd = async (idProd: number) => {
         const idToken = await getIdToken();
         if (!idToken) return;
         DesactivteProduct(idToken, idProd).catch((error) => {
@@ -248,7 +251,7 @@ export default function ListProductsAdmin() {
         });
 
     }
-  const handleActivateProd = async (idProd: number) => { 
+    const handleActivateProd = async (idProd: number) => {
         const idToken = await getIdToken();
         if (!idToken) return;
         ActivateProduct(idToken, idProd).catch((error) => {
@@ -452,7 +455,7 @@ export default function ListProductsAdmin() {
                 isOpen={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 onConfirm={() => { if (selectedProduct) handleDesactivarProd(selectedProduct.id); setIsModalOpen(false); }}
-                message={selectedProduct ? `¿Desactivar "${selectedProduct.nombre}"?` : ""}
+                message={selectedProduct ? `¿Desactivar "${selectedProduct.nombre}"? ya no se mostrará en la tienda.` : ""}
                 cancelText="Cancelar"
                 confirmText="Desactivar"
                 variant="danger"
