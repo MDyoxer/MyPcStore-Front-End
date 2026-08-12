@@ -100,7 +100,7 @@ export default function NewProduct() {
         if (!stock.trim()) e.stock = "El stock es requerido.";
         else if (isNaN(+stock) || +stock < 0) e.stock = "Ingresa un stock válido.";
         if (!categoriaSeleccionada) e.categoria = "Selecciona una categoría.";
-
+        if(!marcaSeleccionada) e.marca = "Selecciona una marca.";
         return e;
     };
 

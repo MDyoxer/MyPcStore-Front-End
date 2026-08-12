@@ -188,7 +188,7 @@ export default function EditProduct() {
                                             exit={{ opacity: 0, scale: 0.95 }} className="w-full h-full relative">
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img src={previewSrc} alt="Preview" className="w-full h-full object-contain p-4" />
-                                            <button type="button" onClick={() => { setPreviewSrc(null); }}
+                                            <button type="button" onClick={() => { setPreviewSrc(null); setFile(null); }}
                                                 className="absolute top-3 right-3 flex items-center justify-center w-7 h-7 bg-black/80 border border-zinc-700 text-zinc-400 hover:text-red-400 hover:border-red-500/40 transition-all duration-200">
                                                 <X className="w-3.5 h-3.5" />
                                             </button>
@@ -418,7 +418,7 @@ export default function EditProduct() {
 
                                 <motion.button type="button"
                                     whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
-                                    onClick={() => { setNombre(""); setPrecio(""); setStock(""); setCategorias([]); setMarcas([]); setDescripcion(""); setSpecs([{ key: "", value: "" }]); setPreviewSrc(null); setErrors({}); }}
+                                    onClick={() => { setNombre(""); setPrecio(""); setStock(""); setCategorias([]); setMarcas([]); setDescripcion(""); setSpecs([{ key: "", value: "" }]); setPreviewSrc(null); setFile(null); setErrors({}); }}
                                     className="flex items-center justify-center gap-2 border border-zinc-700 text-zinc-500 px-6 py-3.5
                              hover:border-zinc-500 hover:text-zinc-300 transition-all duration-200"
                                     style={{

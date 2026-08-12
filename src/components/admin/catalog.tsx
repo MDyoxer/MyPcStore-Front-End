@@ -335,6 +335,7 @@ export default function Catalog() {
 
   const handleCreateBrand = async (name: string) => {
     const idToken = await getIdToken();
+    //TODO: ADD THROW ERROR
     if (!idToken) return;
     await createBrand(idToken, name);
     await refresh();

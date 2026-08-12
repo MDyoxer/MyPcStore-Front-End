@@ -16,9 +16,10 @@ export default function DashboardGuard({ children }: { children: React.ReactNode
     let cancelled = false;
     (async () => {
       if (!user) { if (!cancelled) setStatus("denied"); return; }
-      const token = await getIdToken();
-      if (!token) { if (!cancelled) setStatus("denied"); return; }
       try {
+        const token = await getIdToken();
+        if (!token) { if (!cancelled) setStatus("denied"); return; }
+
         const res = await fetch(buildApiUrl("/auth/me"), {
           headers: { Authorization: `Bearer ${token}` },
         });
