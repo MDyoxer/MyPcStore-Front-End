@@ -28,21 +28,19 @@ type NavGroup = {
 
 // ─── NAVEGACIÓN ───────────────────────────────────────────────────────────────
 const NAV: NavGroup[] = [
-  {
-    group: "General",
-    items: [
-      { label: "Dashboard",     href: "/admin",            icon: LayoutDashboard, color: "#c8ff00" },
-      { label: "Notificaciones",href: "/admin/notifs",     icon: Bell,            color: "#a855f7", badge: 3 },
-    ],
-  },
+  // {
+  //   group: "General",
+  //   items: [
+  //     { label: "Notificaciones",href: "/admin/notifs",     icon: Bell,            color: "#a855f7", badge: 3 },
+  //   ],
+  // },
   {
     group: "Catálogo",
     items: [
       { label: "Productos",       href: "/dashboard/products",     icon: Package,     color: "#c8ff00" },
       { label: "Agregar producto", href: "/dashboard/products/newProduct", icon: PackagePlus, color: "#a855f7" },
       { label: "Editar producto",  href: "/dashboard/products/editProduct", icon: Edit,     color: "#c8ff00" },
-      { label: "Categorías",      href: "/admin/categories",   icon: Tag,         color: "#c8ff00" },
-      { label: "Marcas",          href: "/admin/brands",       icon: Shield,      color: "#a855f7" },
+      { label: "Gestión catálogo",      href: "/dashboard/catalog",   icon: Tag,         color: "#c8ff00" },
     ],
   },
   {
@@ -182,10 +180,10 @@ export default function SideBar() {
                 exit={{ opacity: 0, width: 0 }}
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden whitespace-nowrap group-hover:text-[#c8ff00] transition-colors duration-200"
-                style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.2rem", letterSpacing: "0.1em", color: "#f4f4f5" }}
+                style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.8rem", letterSpacing: "0.1em", color: "#f4f4f5" }}
               >
                 MyPC<span style={{ color: "#c8ff00" }}>Store</span>
-                <span className="block" style={{ fontFamily: "'Space Mono', monospace", fontSize: "7px", letterSpacing: "0.25em", textTransform: "uppercase", color: "#52525b", marginTop: "-2px" }}>
+                <span className="block" style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.25em", textTransform: "uppercase", color: "#52525b", marginTop: "-2px" }}>
                   Panel Admin
                 </span>
               </motion.span>
@@ -217,7 +215,7 @@ export default function SideBar() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15 }}
                   className="px-4 pt-3 pb-1"
-                  style={{ fontFamily: "'Space Mono', monospace", fontSize: "7px", letterSpacing: "0.35em", textTransform: "uppercase", color: "#3f3f46" }}
+                  style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", letterSpacing: "0.35em", textTransform: "uppercase", color: "#3f3f46" }}
                 >
                   {group.group}
                 </motion.p>

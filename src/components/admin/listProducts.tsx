@@ -34,7 +34,7 @@ function StockBadge({ stock }: { stock: number }) {
 }
 
 // ─── CARD CUADRÍCULA ──────────────────────────────────────────────────────────
-function GridCard({ product, index, onRequestedDesactivate }: { product: ProductView; index: number; onRequestedDesactivate: (product: ProductView) => void }) {
+function GridCard({ product, index, onRequestedDesactivate, onCheckActive }: { product: ProductView; index: number; onRequestedDesactivate: (product: ProductView) => void; onCheckActive: (activo: number) => void }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -49,7 +49,7 @@ function GridCard({ product, index, onRequestedDesactivate }: { product: Product
                 style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }} />
 
             {/* Imagen */}
-            <div className="relative aspect-video bg-zinc-900 overflow-hidden">
+            <div className="relative aspect-video bg-zinc-900 overflow-hidden" onClick={() => onCheckActive(product.activo)}>
                 {product.imagen ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={product.imagen} alt={product.nombre} className="w-full h-full object-contain p-3 transition-transform duration-500 group-hover:scale-105" />
@@ -97,10 +97,10 @@ function GridCard({ product, index, onRequestedDesactivate }: { product: Product
                 <button
                     onClick={() => onRequestedDesactivate(product)}
                     className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-600 hover:text-red-500 hover:bg-red-500/05 transition-all duration-200">
-                    {product.active === 1
+                    {product.activo === 1
                         ? <Trash2 className="w-3.5 h-3.5" />
                         : <Eye className="w-3.5 h-3.5" />}
-                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase" }}>{Number(product.active) === 1 ? "Desactivar" : "Activar"}</span>
+                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase" }}>{Number(product.activo) === 1 ? "Desactivar" : "Activar"}</span>
 
                 </button>
             </div>
@@ -109,7 +109,7 @@ function GridCard({ product, index, onRequestedDesactivate }: { product: Product
 }
 
 // ─── FILA LISTA ───────────────────────────────────────────────────────────────
-function ListRow({ product, index, onRequestedDesactivate }: { product: ProductView; index: number; onRequestedDesactivate: (product: ProductView) => void }) {
+function ListRow({ product, index, onRequestedDesactivate, onCheckActive }: { product: ProductView; index: number; onRequestedDesactivate: (product: ProductView) => void; onCheckActive: (activo: number) => void }) {
     return (
         <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -131,7 +131,7 @@ function ListRow({ product, index, onRequestedDesactivate }: { product: ProductV
 
             {/* Imagen mini */}
             <div className="shrink-0 w-12 h-12 bg-zinc-900 flex items-center justify-center overflow-hidden"
-                style={{ clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px))" }}>
+                style={{ clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px))" }} onClick={() => onCheckActive(product.activo)}>
                 {product.imagen
                     // eslint-disable-next-line @next/next/no-img-element
                     ? <img src={product.imagen} alt="" className="w-full h-full object-contain p-1" />
@@ -199,7 +199,7 @@ export default function ListProductsAdmin() {
         setSelectedProduct(product);
         setIsModalOpen(true);
     };
-
+   
     const { getIdToken } = useAuth();
     useEffect(() => {
         const fetchAll = async () => {
@@ -259,7 +259,9 @@ export default function ListProductsAdmin() {
         });
 
     }
-
+    const handleCheckactive = (activo:number) =>{
+        console.log("valor activo", activo)
+    }
     return (
         <div className="w-full bg-black min-h-screen relative overflow-hidden">
 
@@ -432,12 +434,12 @@ export default function ListProductsAdmin() {
                     ) : view === "grid" ? (
                         <motion.div key="grid" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-zinc-800/30">
-                            {filtered.map((p, i) => <GridCard key={p.id} product={p} index={i} onRequestedDesactivate={openDesactivateModal} />)}
+                            {filtered.map((p, i) => <GridCard key={p.id} product={p} index={i} onRequestedDesactivate={openDesactivateModal} onCheckActive={handleCheckactive} />)}
                         </motion.div>
                     ) : (
                         <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="flex flex-col gap-2">
-                            {filtered.map((p, i) => <ListRow key={p.id} product={p} index={i} onRequestedDesactivate={openDesactivateModal} />)}
+                            {filtered.map((p, i) => <ListRow key={p.id} product={p} index={i} onRequestedDesactivate={openDesactivateModal} onCheckActive={handleCheckactive} />)}
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -455,9 +457,15 @@ export default function ListProductsAdmin() {
                 isOpen={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 onConfirm={() => { if (selectedProduct) handleDesactivarProd(selectedProduct.id); setIsModalOpen(false); }}
-                message={selectedProduct ? `¿Desactivar "${selectedProduct.nombre}"? ya no se mostrará en la tienda.` : ""}
+                message={
+                    selectedProduct
+                        ? selectedProduct.activo === 1
+                            ? `¿Desactivar "${selectedProduct.nombre}"? Ya no se mostrará en la tienda.`
+                            : `¿Activar "${selectedProduct.nombre}"? Se mostrará en la tienda.`
+                        : ''
+                }
                 cancelText="Cancelar"
-                confirmText="Desactivar"
+                confirmText={selectedProduct && selectedProduct.activo === 1 ? "Desactivar" : "Activar"}
                 variant="danger"
             />
             <style>{`
