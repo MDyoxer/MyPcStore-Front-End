@@ -7,26 +7,38 @@ import { buildApiUrl } from "@/src/utils/baseApiUrl";
 type Status = "loading" | "admin" | "denied";
 
 export default function DashboardGuard({ children }: { children: React.ReactNode }) {
-  const { getIdToken } = useAuth();
+  const { user, loading, getIdToken } = useAuth();
   const router = useRouter();
   const [status, setStatus] = useState<Status>("loading");
 
   useEffect(() => {
+    if (loading) return;
     let cancelled = false;
     (async () => {
-      const token = await getIdToken();
-      if (!token) { if (!cancelled) setStatus("denied"); return; }
+      if (!user) { if (!cancelled) setStatus("denied"); return; }
       try {
+        const token = await getIdToken();
+        if (!token) { if (!cancelled) setStatus("denied"); return; }
+
         const res = await fetch(buildApiUrl("/auth/me"), {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!cancelled) setStatus(res.ok ? "admin" : "denied");
-      } catch {
+        if (!cancelled) {
+          if (res.ok) {
+            setStatus("admin");
+          } else {
+            const body = await res.text().catch(() => "");
+            console.error(`/auth/me responded ${res.status}: ${body}`);
+            setStatus("denied");
+          }
+        }
+      } catch (error) {
+        console.error("/auth/me fetch failed:", error);
         if (!cancelled) setStatus("denied");
       }
     })();
     return () => { cancelled = true; };
-  }, [getIdToken]);
+  }, [loading, user, getIdToken]);
 
   useEffect(() => { if (status === "denied") router.replace("/"); }, [status, router]);
 

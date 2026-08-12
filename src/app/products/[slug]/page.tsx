@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import ProductDetails from "@/src/components/products/ProductDetails";
 import { buildApiUrl } from "@/src/utils/baseApiUrl";
 import { slugify } from "@/src/utils/slugify";
-import type { Products } from "@/src/actions/products/get-all-products";
+import type { Products } from "@/src/actions/products/get-all-active-products";
 
 async function resolveProductId(slug: string): Promise<number | null> {
   const response = await fetch(buildApiUrl("/products/findAllProducts"), {

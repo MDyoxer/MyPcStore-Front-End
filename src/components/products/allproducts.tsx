@@ -8,7 +8,7 @@ import {
   ChevronDown, SlidersHorizontal, X, Search, ArrowUpDown,
 } from "lucide-react";
 import { GetCategories, Categories } from "@/src/actions/categories/get-all-categories";
-import { GetProducts, Products } from "@/src/actions/products/get-all-products";
+import { GetProducts, Products } from "@/src/actions/products/get-all-active-products";
 import { GetBrands, Brands } from "@/src/actions/brands/get-all-brands";
 import { formatMoney } from "@/src/utils/formatMoney";
 import { slugify } from "@/src/utils/slugify";

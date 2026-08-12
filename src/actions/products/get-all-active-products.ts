@@ -1,4 +1,4 @@
-//Get all products from the api and return them as a list of Product objects 
+//Get all products from the api and return them as a list of Product objects used on TopProducts.tsx
 "use client"
 import { buildApiUrl } from "@/src/utils/baseApiUrl"
 export type Products = {
@@ -14,7 +14,7 @@ export type Products = {
 
 
 export async function GetProducts(): Promise<Products[]> {
-    const response = await fetch(buildApiUrl("/products/findAllProductsAdmin"), {
+    const response = await fetch(buildApiUrl("/products/findAllProducts"), {
         method: "GET",
         cache: "no-store",
     });

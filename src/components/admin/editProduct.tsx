@@ -49,7 +49,7 @@ const inputStyle = {
 };
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
-export default function NewProduct() {
+export default function EditProduct() {
     // Form state
     const [nombre, setNombre] = useState("");
     const [precio, setPrecio] = useState("");
@@ -100,7 +100,7 @@ export default function NewProduct() {
         if (!stock.trim()) e.stock = "El stock es requerido.";
         else if (isNaN(+stock) || +stock < 0) e.stock = "Ingresa un stock válido.";
         if (!categoriaSeleccionada) e.categoria = "Selecciona una categoría.";
-        if(!marcaSeleccionada) e.marca = "Selecciona una marca.";
+
         return e;
     };
 
@@ -160,7 +160,7 @@ export default function NewProduct() {
                         <span className="w-8 h-px bg-[#c8ff00]" /> Catálogo
                     </div>
                     <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "0.02em", lineHeight: 0.95 }}>
-                        <span className="text-white">AGREGAR </span>
+                        <span className="text-white">EDITAR </span>
                         <span style={{ color: "transparent", WebkitTextStroke: "1.5px #c8ff00" }}>PRODUCTO</span>
                     </h1>
                 </motion.div>
@@ -188,7 +188,7 @@ export default function NewProduct() {
                                             exit={{ opacity: 0, scale: 0.95 }} className="w-full h-full relative">
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img src={previewSrc} alt="Preview" className="w-full h-full object-contain p-4" />
-                                            <button type="button" onClick={() => { setPreviewSrc(null); }}
+                                            <button type="button" onClick={() => { setPreviewSrc(null); setFile(null); }}
                                                 className="absolute top-3 right-3 flex items-center justify-center w-7 h-7 bg-black/80 border border-zinc-700 text-zinc-400 hover:text-red-400 hover:border-red-500/40 transition-all duration-200">
                                                 <X className="w-3.5 h-3.5" />
                                             </button>
@@ -405,12 +405,12 @@ export default function NewProduct() {
                                         {saved ? (
                                             <motion.span key="saved" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                                                 className="flex items-center gap-2">
-                                                <Check className="w-4 h-4" /> Producto guardado
+                                                <Check className="w-4 h-4" /> Producto editado
                                             </motion.span>
                                         ) : (
                                             <motion.span key="save" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                                                 className="flex items-center gap-2">
-                                                <Package className="w-4 h-4" /> Guardar producto
+                                                <Package className="w-4 h-4" /> Guardar edición
                                             </motion.span>
                                         )}
                                     </AnimatePresence>
@@ -418,7 +418,7 @@ export default function NewProduct() {
 
                                 <motion.button type="button"
                                     whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
-                                    onClick={() => { setNombre(""); setPrecio(""); setStock(""); setCategorias([]); setMarcas([]); setDescripcion(""); setSpecs([{ key: "", value: "" }]); setPreviewSrc(null); setErrors({}); }}
+                                    onClick={() => { setNombre(""); setPrecio(""); setStock(""); setCategorias([]); setMarcas([]); setDescripcion(""); setSpecs([{ key: "", value: "" }]); setPreviewSrc(null); setFile(null); setErrors({}); }}
                                     className="flex items-center justify-center gap-2 border border-zinc-700 text-zinc-500 px-6 py-3.5
                              hover:border-zinc-500 hover:text-zinc-300 transition-all duration-200"
                                     style={{
